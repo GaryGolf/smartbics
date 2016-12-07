@@ -47,9 +47,12 @@
 	"use strict";
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(2);
-	var login_1 = __webpack_require__(4);
-	console.log('index.tsx');
-	ReactDOM.render(React.createElement(login_1.default, {users: ['computer', 'beavis', 'butthead']}), document.getElementById('layout'));
+	// import Login from './components/login'
+	var game_1 = __webpack_require__(3);
+	// console.log('index.tsx')
+	// ReactDOM.render(<Game turns={[]} users={['vanya','tanya']}/>,document.getElementById('layout'))
+	ReactDOM.render(React.createElement(game_1.default, {turns: [2, 3, 5, 7, 8], users: ['vanya', 'tanya']}), document.getElementById('layout'));
+	// ReactDOM.render(<Login users={['computer','beavis','butthead']}/>,document.getElementById('layout'))
 
 
 /***/ },
@@ -65,8 +68,7 @@
 	module.exports = ReactDOM;
 
 /***/ },
-/* 3 */,
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75,144 +77,187 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var __assign = (this && this.__assign) || Object.assign || function(t) {
-	    for (var s, i = 1, n = arguments.length; i < n; i++) {
-	        s = arguments[i];
-	        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-	            t[p] = s[p];
-	    }
-	    return t;
-	};
 	var React = __webpack_require__(1);
-	var login_style_1 = __webpack_require__(5);
-	var Login = (function (_super) {
-	    __extends(Login, _super);
-	    function Login(props) {
+	var game_style_1 = __webpack_require__(4);
+	var robot_1 = __webpack_require__(7);
+	var Game = (function (_super) {
+	    __extends(Game, _super);
+	    function Game(props) {
 	        _super.call(this, props);
+	        this.cells = new Array(9);
+	        this.turns = [];
+	        this.playMode = false;
+	        // [this.user1,this.user2] =this.props.users
 	    }
-	    Login.prototype.componentDidMount = function () {
-	        this.input1.focus();
-	        this.input2.disabled = true;
+	    Game.prototype.componentDidMount = function () {
+	        console.log('yo');
+	        this.user1.classList.add(game_style_1.jss.underline);
+	        if (this.props.turns.length > 0)
+	            this.play();
 	    };
-	    Login.prototype.input1Handler = function (event) {
-	        var i1 = this.input1;
-	        var i2 = this.input2;
-	        switch (event.key) {
-	            case 'Enter':
-	                // user1 name should not be empty
-	                if (i1.value == '')
-	                    break;
-	                if (i2.value != '' && i1.value != i2.value)
-	                    return this.bingo();
-	                i2.disabled = false;
-	                // maybe user1 wants to play with computer?
-	                i2.value = 'computer';
-	                // maybe not
-	                i2.setSelectionRange(0, 100);
-	                i2.focus();
-	            case 'Backspace':
-	                break;
-	            default:
-	                this.userAutocomplete(1);
-	        }
-	    };
-	    Login.prototype.input2Handler = function (event) {
-	        var i1 = this.input1;
-	        var i2 = this.input2;
-	        switch (event.key) {
-	            case 'Enter':
-	                // user1 name should not be empty
-	                if (i1.value == '' || i2.value == '' || i1.value == i2.value)
-	                    break;
-	                i2.setSelectionRange(0, 0);
-	                i2.blur();
-	                this.bingo();
-	            case 'Backspace':
-	                break;
-	            default:
-	                this.userAutocomplete(2);
-	        }
-	    };
-	    Login.prototype.userAutocomplete = function (inputNum) {
-	        var input = (inputNum == 1) ? this.input1 : this.input2;
-	        var length = input.value.length;
-	        if (length < 3)
-	            return;
-	        for (var i = 0; i < this.props.users.length; i++)
-	            if (this.props.users[i].indexOf(input.value) == 0) {
-	                input.value = this.props.users[i];
-	                input.setSelectionRange(length, input.value.length);
-	                return;
-	            }
-	    };
-	    Login.prototype.bingo = function () {
-	        console.log("user1 " + this.input1.value + " user2 " + this.input2.value);
-	    };
-	    Login.prototype.render = function () {
+	    Game.prototype.play = function () {
 	        var _this = this;
-	        var in1 = { onKeyUp: this.input1Handler.bind(this) };
-	        var in2 = { onKeyUp: this.input2Handler.bind(this) };
-	        return (React.createElement("div", {className: login_style_1.jss.login}, 
-	            React.createElement("h3", {className: login_style_1.jss.title}, "крестики - нолики"), 
-	            React.createElement("input", __assign({ref: function (el) { return _this.input1 = el; }, className: login_style_1.jss.input, type: "text", placeholder: "User 1"}, in1)), 
-	            React.createElement("input", __assign({ref: function (el) { return _this.input2 = el; }, className: login_style_1.jss.input, type: "text", placeholder: "User 2"}, in2)), 
-	            React.createElement("style", null, login_style_1.Style.getStyles())));
+	        this.playMode = true;
+	        var i = 0;
+	        var int = setInterval(function () {
+	            if (_this.props.turns.length > i) {
+	                _this.makeTurn(_this.props.turns[i++]);
+	            }
+	            else {
+	                clearInterval(int);
+	            }
+	        }, 1500);
 	    };
-	    return Login;
+	    Game.prototype.makeTurn = function (sector) {
+	        // empty sector?
+	        if (this.turns.indexOf(sector) >= 0)
+	            return;
+	        // save turn
+	        this.turns.push(sector);
+	        // odd - tic, even - tac
+	        var className = (this.turns.length % 2) ? 'fa fa-times fa-3x' : 'fa fa-circle fa-3x';
+	        this.cells[sector].children.item(0).className = className;
+	        var robot = new robot_1.default(this.turns);
+	        if (robot.won()) {
+	            var name_1 = (this.turns.length % 2) ? this.props.users[0] : this.props.users[1];
+	            console.log('the winner is ' + name_1);
+	            this.playMode = true;
+	            return;
+	        }
+	        this.user1.classList.toggle(game_style_1.jss.underline);
+	        this.user2.classList.toggle(game_style_1.jss.underline);
+	    };
+	    // user click handler
+	    Game.prototype.turn = function (sector) {
+	        if (this.playMode)
+	            return;
+	        this.makeTurn(sector);
+	    };
+	    Game.prototype.render = function () {
+	        return (React.createElement("div", {className: game_style_1.jss.game}, 
+	            React.createElement("table", null, this.drawBoard()), 
+	            React.createElement("table", null, this.drawUsers()), 
+	            React.createElement("style", null, game_style_1.Style.getStyles())));
+	    };
+	    Game.prototype.drawBoard = function () {
+	        var _this = this;
+	        return (React.createElement("tbody", null, 
+	            React.createElement("tr", null, 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[0] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 0)}, 
+	                        React.createElement("i", null)
+	                    )
+	                ), 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[1] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 1)}, 
+	                        React.createElement("i", null)
+	                    )
+	                ), 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[2] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 2)}, 
+	                        React.createElement("i", null)
+	                    )
+	                )), 
+	            React.createElement("tr", null, 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[3] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 3)}, 
+	                        React.createElement("i", null)
+	                    )
+	                ), 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[4] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 4)}, 
+	                        React.createElement("i", null)
+	                    )
+	                ), 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[5] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 5)}, 
+	                        React.createElement("i", null)
+	                    )
+	                )), 
+	            React.createElement("tr", null, 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[6] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 6)}, 
+	                        React.createElement("i", null)
+	                    )
+	                ), 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[7] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 7)}, 
+	                        React.createElement("i", null)
+	                    )
+	                ), 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.cells[8] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 8)}, 
+	                        React.createElement("i", null)
+	                    )
+	                ))));
+	    };
+	    Game.prototype.drawUsers = function () {
+	        var _this = this;
+	        return (React.createElement("tbody", null, 
+	            React.createElement("tr", null, 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.user1 = d; }, className: game_style_1.jss.user}, 
+	                        React.createElement("i", {className: "fa fa-times"}), 
+	                        " ", 
+	                        this.props.users[0])
+	                ), 
+	                React.createElement("td", null, 
+	                    React.createElement("div", {ref: function (d) { return _this.user2 = d; }, className: game_style_1.jss.user}, 
+	                        React.createElement("i", {className: "fa fa-circle"}), 
+	                        " ", 
+	                        this.props.users[1])
+	                ))
+	        ));
+	    };
+	    return Game;
 	}(React.Component));
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Login;
+	exports.default = Game;
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var FreeStyle = __webpack_require__(5);
+	exports.Style = FreeStyle.create();
+	var width = 360;
+	exports.jss = {
+	    game: exports.Style.registerStyle({
+	        position: 'absolute',
+	        margin: 'auto',
+	        marginTop: '10%',
+	    }),
+	    cell: exports.Style.registerStyle({
+	        // width: '120px',
+	        // heisght: '120px',
+	        display: 'table-cell',
+	        width: width / 3,
+	        height: width / 3,
+	        verticalAlign: 'middle',
+	        textAlign: 'center',
+	        background: 'rgba(255,255,255,.5)',
+	        border: '1px solid gray',
+	        cursor: 'default',
+	    }),
+	    user: exports.Style.registerStyle({
+	        width: width / 2,
+	        color: 'white',
+	        padding: '15px',
+	        display: 'table-cell',
+	        verticalAlign: 'middle',
+	        textAlign: 'center',
+	        fontSize: '2rem'
+	    }),
+	    underline: exports.Style.registerStyle({
+	        textDecoration: 'underline'
+	    }),
+	};
 
 
 /***/ },
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var FreeStyle = __webpack_require__(6);
-	exports.Style = FreeStyle.create();
-	exports.jss = {
-	    input: exports.Style.registerStyle({
-	        padding: '4px 12px 4px 12px',
-	        border: '2px solid gray',
-	        borderRadius: '6px',
-	        boxSizing: 'border-box',
-	        float: 'none',
-	        transitionDuration: '0.5s',
-	        margin: '7px',
-	        width: '250px',
-	        '&:focus': {
-	            outline: 'none',
-	            boxShadow: '3px 3px 6px #222328',
-	            borderColor: 'silver'
-	        }
-	    }),
-	    login: exports.Style.registerStyle({
-	        // position: 'relative',
-	        // display: 'table-cell',
-	        // verticalAlign: 'middle',
-	        margin: 'auto',
-	        marginTop: '10%',
-	        border: '2px dashed #677380',
-	        padding: '0px 20px 20px 20px',
-	        width: '310px'
-	    }),
-	    title: exports.Style.registerStyle({
-	        color: '#A7A3AA',
-	        cursor: 'default',
-	        userSelect: 'none',
-	        MozUserSelect: 'none',
-	        WebkitUserSelect: 'none',
-	        msUserSelect: 'none',
-	        '&:hover': {
-	            textShadow: '2px 2px 4px #222328'
-	        }
-	    }),
-	};
-
-
-/***/ },
-/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {"use strict";
@@ -658,10 +703,10 @@
 	}
 	exports.create = create;
 	//# sourceMappingURL=free-style.js.map
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -844,6 +889,59 @@
 	    throw new Error('process.chdir is not supported');
 	};
 	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var Robot = (function () {
+	    function Robot(turns) {
+	        this.turns = turns;
+	    }
+	    Robot.prototype.won = function () {
+	        var _this = this;
+	        var cases = [
+	            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+	            [0, 3, 6], [1, 4, 5], [2, 5, 8],
+	            [0, 4, 8], [2, 4, 6]
+	        ];
+	        // filter last user turns
+	        //the turns of the user , who made his turn last
+	        var turns = this.turns.filter(function (val, idx) { return (_this.turns.length % 2 + idx % 2 == 1); }).sort();
+	        if (turns.length < 3)
+	            return false;
+	        return inspectAllCases(cases, createArrayOfTripples(turns));
+	    };
+	    return Robot;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Robot;
+	//modify  array from [1,2,3,4] => [[1,2,3],[1,2,4],[1,3,4],[2,3,4]]
+	function createArrayOfTripples(arr) {
+	    var tripples = [];
+	    for (var i = 0; i < arr.length - 2; i++)
+	        for (var j = 1; j < arr.length - 1; j++)
+	            for (var k = 2; k < arr.length; k++)
+	                tripples.push([arr[i], arr[j], arr[k]]);
+	    return tripples;
+	}
+	function compareArray(arr1, arr2) {
+	    if (arr1.length != arr2.length)
+	        return false;
+	    for (var i = 0; i < arr1.length; i++)
+	        if (arr1[i] !== arr2[i])
+	            return false;
+	    return true;
+	}
+	function inspectAllCases(cases, test) {
+	    for (var i = 0; i < cases.length; i++)
+	        for (var j = 0; j < test.length; j++)
+	            if (compareArray(cases[i], test[j]))
+	                return true;
+	    return false;
+	}
 
 
 /***/ }

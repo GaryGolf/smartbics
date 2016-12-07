@@ -1,6 +1,6 @@
 # Tic Tac Toe
 
-## test application
+## test assignmnt
 
 ```
 git clone https://github.com/GaryGolf/smartbics.git
