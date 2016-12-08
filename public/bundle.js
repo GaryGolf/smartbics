@@ -61,20 +61,18 @@
 	    function App(props) {
 	        _super.call(this, props);
 	        this.message = 'hello';
-	        this.stage = 2;
+	        this.stage = 0;
 	    }
 	    App.prototype.componentWillMount = function () {
 	        // console.log('will')
-	        console.log(localstore_1.getLeaderboardRecords());
+	        // localStorage.clear()
 	    };
 	    App.prototype.getUsers = function (users) {
 	        this.users = users;
 	        this.stage = 1;
 	        this.forceUpdate();
-	        // console.log(users)
 	    };
 	    App.prototype.getResult = function (status) {
-	        var _this = this;
 	        console.log('get results');
 	        switch (status) {
 	            // draw
@@ -85,11 +83,6 @@
 	                this.message = 'draw';
 	                // show 'draw' message for a while 
 	                this.forceUpdate();
-	                // then play again
-	                setTimeout(function () {
-	                    _this.stage = 1;
-	                    _this.forceUpdate();
-	                }, 2000);
 	                break;
 	            case 1:
 	            case 2:
@@ -117,7 +110,8 @@
 	            case 1:
 	                return React.createElement(game_1.default, {turns: [], users: this.users, callback: this.getResult.bind(this)});
 	            case 2:
-	                return React.createElement(leaderboard_1.default, {message: this.message, callback: this.getResult.bind(this), leaderboard: localstore_1.getLeaderboardRecords()});
+	                var leaderboard = localstore_1.getLeaderboardRecords();
+	                return React.createElement(leaderboard_1.default, {message: this.message, callback: this.getResult.bind(this), leaderboard: leaderboard});
 	            default:
 	                return null;
 	        }
@@ -1125,7 +1119,7 @@
 	function win(turns) {
 	    var cases = [
 	        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-	        [0, 3, 6], [1, 4, 5], [2, 5, 8],
+	        [0, 3, 6], [1, 4, 7], [2, 5, 8],
 	        [0, 4, 8], [2, 4, 6]
 	    ];
 	    // filter last user turns
@@ -1266,8 +1260,6 @@
 	}
 	exports.getRecord = getRecord;
 	function updateRecords(winner, looser) {
-	    // updateWinnerRecord(winner)
-	    // updateLooserRecord(looser)
 	    var winnerUpdated = false;
 	    var looserUpdated = false;
 	    var records = getLeaderboardRecords();
@@ -1276,70 +1268,36 @@
 	        if (val.name == winner) {
 	            winnerUpdated = true;
 	            val.w++;
+	            console.log(winner + ' updated');
 	            return val;
 	        }
 	        else if (val.name == looser) {
 	            looserUpdated = true;
 	            val.l++;
+	            console.log(looser + ' updated');
 	            return val;
 	        }
 	        else
 	            return val;
-	    }).sort(function (a, b) { return a.w - b.w; });
+	    }).sort(function (a, b) { return b.w - a.w; });
 	    //in case player are new insert them to  store
 	    if (!winnerUpdated)
-	        newRecord({ name: winner, w: 1, l: 0 });
+	        newRecords.push({ name: winner, w: 1, l: 0 });
 	    if (!looserUpdated)
-	        newRecord({ name: looser, w: 0, l: 1 });
+	        newRecords.push({ name: looser, w: 0, l: 1 });
 	    localStorage.setItem('leaderboard', JSON.stringify(newRecords));
 	}
 	exports.updateRecords = updateRecords;
-	function updateWinnerRecord(name) {
-	    var record = getRecord(name);
-	    if (!record) {
-	        newRecord({ name: name, w: 1, l: 0 });
-	    }
-	    else {
-	        record.w++;
-	        updateRecord(record);
-	    }
-	}
-	function updateLooserRecord(name) {
-	    var record = getRecord(name);
-	    if (!record) {
-	        newRecord({ name: name, w: 0, l: 1 });
-	    }
-	    else {
-	        record.l++;
-	        updateRecord(record);
-	    }
-	}
-	function updateRecord(record) {
-	    var records = getLeaderboardRecords();
-	    var newRecords = records.map(function (val) {
-	        if (val.name == record.name)
-	            return record;
-	        else
-	            val;
-	    });
-	    localStorage.setItem('leaderboard', JSON.stringify(newRecords));
-	}
-	function newRecord(record) {
-	    var records = getLeaderboardRecords();
-	    records.push(record);
-	    localStorage.setItem('leaderboard', JSON.stringify(records));
-	}
 	function getLeaderboardRecords() {
-	    var records;
-	    var store = localStorage.getItem('leaderboard');
+	    var records = [];
+	    var store = localStorage['leaderboard'];
 	    if (!store)
 	        return [];
 	    try {
-	        records = JSON.parse(store);
+	        records = JSON.parse(store) || [];
 	    }
 	    catch (e) {
 	        console.error(e);
-	        return [];
 	    }
 	    return records;
 	}

@@ -18,18 +18,17 @@ class App extends React.Component<Props,State>{
     constructor(props: Props){
         super(props)
         this.message = 'hello'
-        this.stage = 2
+        this.stage = 0
     }
     componentWillMount(){
         // console.log('will')
-        console.log(getLeaderboardRecords())
+        // localStorage.clear()
     }
 
     getUsers(users: string[]){
         this.users = users
         this.stage = 1
         this.forceUpdate()
-        // console.log(users)
     }
 
 
@@ -43,13 +42,9 @@ class App extends React.Component<Props,State>{
                 this.users  = [this.users[1], this.users[0]]
                 this.stage = 2
                 this.message = 'draw'
+                
                 // show 'draw' message for a while 
                 this.forceUpdate()
-                // then play again
-                setTimeout(() => {
-                    this.stage = 1
-                    this.forceUpdate()}
-                ,2000)
                 break
             case 1 :
 
@@ -61,7 +56,7 @@ class App extends React.Component<Props,State>{
                 // save stats
                 updateRecords(winner, looser)
                 this.stage = 2
-                this.forceUpdate()
+                this.forceUpdate() 
                 break
             case 3 : 
                 this.users  = [this.users[1], this.users[0]]
@@ -73,14 +68,16 @@ class App extends React.Component<Props,State>{
     }
 
     render(){
+       
         switch(this.stage) {
             case 0 :
                 return <Login users={getNames()} callback={this.getUsers.bind(this)}/>
             case 1 :
                 return <Game turns={[]} users={this.users} callback={this.getResult.bind(this)}/>
             case 2 :
+                 const leaderboard = getLeaderboardRecords()
                 return <Leaderboard message={this.message} callback={this.getResult.bind(this)}  
-                leaderboard={getLeaderboardRecords()}/>
+                leaderboard={leaderboard}/>
             default :
              return null
         }    
