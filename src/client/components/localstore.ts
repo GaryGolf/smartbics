@@ -1,5 +1,7 @@
 
 export interface LeaderboardRecord { name: string, w: number, l: number}
+export interface LeaderboardLog {name: string, users: string[], turns: number[], date:number}
+
 
 export function getNames(): string[] {
 
@@ -52,4 +54,28 @@ export function getLeaderboardRecords(): LeaderboardRecord[] {
         console.error(e)
     }
     return records
+}
+
+export function getLogDataByName(name: string): LeaderboardLog[] {
+    const data: LeaderboardLog[] = getLogData()
+    return data.filter(val => val.name == name)
+        .sort((a,b) =>  b.date - a.date) 
+}
+
+export function writeToLog(logData: LeaderboardLog): void {
+    const data = getLogData()
+    data.push(logData)
+    localStorage['log'] = JSON.stringify(data) 
+} 
+
+function getLogData(): LeaderboardLog[] {
+    let data: LeaderboardLog[] = []
+    const store = localStorage['log'] 
+    if(!store) return []
+    try {
+        data = JSON.parse(store) || []
+    } catch (e) {
+        console.error(e)
+    }
+    return data
 }

@@ -17,22 +17,23 @@ export default class Game extends React.Component <Props, State>{
         this.cells = new Array(9)
         this.turns = []
         this.playMode = false
+        // if(this.turns.length > 0 ) this.playMode = true
         
 
         // [this.user1,this.user2] =this.props.users
     }
 
     componentDidMount(){
-        console.log('yo')
         this.user1.classList.add(jss.underline)
         if(this.props.turns.length > 0) this.play()
     }
     play(){
+        // console.log('play')
         this.playMode = true
         var i = 0
         const int = setInterval(()=>{
-            if(this.props.turns.length > i){
-                this.makeTurn(this.props.turns[i++])
+            if(this.props.turns.length > i) {
+                   this.makeTurn(this.props.turns[i++])
             } else {
                 clearInterval(int)
             }
@@ -50,9 +51,15 @@ export default class Game extends React.Component <Props, State>{
         // does somebody win ?
         if(win(this.turns)) {
             const user = (this.turns.length%2) ? 0 : 1
-            console.log('the winner is '+  this.props.users[user])
-            this.props.callback(user + 1)
-            // this.playMode = true
+            // console.log('the winner is '+  this.props.users[user])
+            // save to log
+            
+            if(!this.playMode) {
+                this.playMode = true
+                setTimeout(this.props.callback.bind(this,user + 1,this.turns),500)
+            }else{
+                setTimeout(this.props.callback.bind(this,0,this.turns),1500)
+            }
             return
         }
         if(isGameEnded(this.turns)) this.props.callback(0) // draw
@@ -66,10 +73,12 @@ export default class Game extends React.Component <Props, State>{
     }
     render(){
         return (
+            <div className={jss.container}>
             <div className={jss.game}>
                 <table>{this.drawBoard()}</table>
                 <table>{this.drawUsers()}</table>
                 <style>{Style.getStyles()}</style>
+            </div>
             </div>
         )
     }

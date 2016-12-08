@@ -3,14 +3,28 @@ import * as FreeStyle from 'free-style'
 
 export const Style = FreeStyle.create()
 
-const width = 360
+const width = 340
 
 export const jss = {
+
+    container: Style.registerStyle({
+        position: 'absolute',
+        top: '0px',
+        left: '10px',
+        width: '100%',
+        height: '100%',
+        display: 'table-cell',
+        textAlign: 'center'
+        // padding: '100px'
+
+
+    }),
     game: Style.registerStyle({
 
-        position: 'absolute',
+        position: 'relative',
         margin: 'auto',
-        marginTop: '10%',
+        width: '360px',
+        marginTop: '20%',
         // border: '1px solid black' 
     }),
     cell: Style.registerStyle({
@@ -27,7 +41,7 @@ export const jss = {
     }),
     user: Style.registerStyle({
         width: width/2,
-        color: 'white',
+        color: '#AAAAAA',
         padding: '15px',
         display: 'table-cell',
         verticalAlign: 'middle',
@@ -36,6 +50,7 @@ export const jss = {
         // background: 'rgba(255,255,255,.5)',
     }),
     underline: Style.registerStyle({
+        color: 'white',
         textDecoration: 'underline'
     }),
 

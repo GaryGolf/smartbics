@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom'
 import Login from './components/login'
 import Game from './components/game'
 import Leaderboard from './components/leaderboard'
-import {getNames, updateRecords,getLeaderboardRecords} from './components/localstore'
+import {getNames, updateRecords,getLeaderboardRecords, writeToLog} from './components/localstore'
 
 
 
@@ -15,14 +15,17 @@ class App extends React.Component<Props,State>{
     private stage: number
     private users: string[]
     private message: string
+    private turns: number[]
+    private players: string[]
     constructor(props: Props){
         super(props)
         this.message = 'hello'
-        this.stage = 0
+        this.stage = 2
     }
     componentWillMount(){
         // console.log('will')
         // localStorage.clear()
+        console.log(localStorage['log'])
     }
 
     getUsers(users: string[]){
@@ -33,7 +36,7 @@ class App extends React.Component<Props,State>{
 
 
 
-    getResult(status: number){
+    getResult(status: number, turns?: any){
         console.log('get results')
         switch(status){
             // draw
@@ -41,13 +44,12 @@ class App extends React.Component<Props,State>{
                 // switch users
                 this.users  = [this.users[1], this.users[0]]
                 this.stage = 2
-                this.message = 'draw'
+                this.message = 'lets play again'
                 
                 // show 'draw' message for a while 
                 this.forceUpdate()
                 break
             case 1 :
-
             case 2 :
                 // someone wins
                 const winner = this.users[status-1]
@@ -55,14 +57,25 @@ class App extends React.Component<Props,State>{
                 this.message = winner + ' wins!'
                 // save stats
                 updateRecords(winner, looser)
+                writeToLog({name: winner,date: Date.now(),users: this.users,turns})
                 this.stage = 2
                 this.forceUpdate() 
                 break
-            case 3 : 
+            case 3 : // play again
                 this.users  = [this.users[1], this.users[0]]
                 this.stage = 1
                 this.forceUpdate()
                 break
+            case 4 :  // replay old game
+                this.players = turns.users
+                this.turns = turns.turns
+                this.stage = 3
+                this.forceUpdate()
+                break
+            case 5 : // new game
+                this.stage = 0
+                this.forceUpdate()
+                break;
             default :
         }
     }
@@ -75,9 +88,9 @@ class App extends React.Component<Props,State>{
             case 1 :
                 return <Game turns={[]} users={this.users} callback={this.getResult.bind(this)}/>
             case 2 :
-                 const leaderboard = getLeaderboardRecords()
-                return <Leaderboard message={this.message} callback={this.getResult.bind(this)}  
-                leaderboard={leaderboard}/>
+                return <Leaderboard message={this.message} callback={this.getResult.bind(this)} />
+            case 3 :
+                return <Game turns={this.turns} users={this.players} callback={this.getResult.bind(this)}/>
             default :
              return null
         }    

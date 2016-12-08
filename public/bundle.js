@@ -61,18 +61,19 @@
 	    function App(props) {
 	        _super.call(this, props);
 	        this.message = 'hello';
-	        this.stage = 0;
+	        this.stage = 2;
 	    }
 	    App.prototype.componentWillMount = function () {
 	        // console.log('will')
 	        // localStorage.clear()
+	        console.log(localStorage['log']);
 	    };
 	    App.prototype.getUsers = function (users) {
 	        this.users = users;
 	        this.stage = 1;
 	        this.forceUpdate();
 	    };
-	    App.prototype.getResult = function (status) {
+	    App.prototype.getResult = function (status, turns) {
 	        console.log('get results');
 	        switch (status) {
 	            // draw
@@ -80,7 +81,7 @@
 	                // switch users
 	                this.users = [this.users[1], this.users[0]];
 	                this.stage = 2;
-	                this.message = 'draw';
+	                this.message = 'lets play again';
 	                // show 'draw' message for a while 
 	                this.forceUpdate();
 	                break;
@@ -92,12 +93,23 @@
 	                this.message = winner + ' wins!';
 	                // save stats
 	                localstore_1.updateRecords(winner, looser);
+	                localstore_1.writeToLog({ name: winner, date: Date.now(), users: this.users, turns: turns });
 	                this.stage = 2;
 	                this.forceUpdate();
 	                break;
 	            case 3:
 	                this.users = [this.users[1], this.users[0]];
 	                this.stage = 1;
+	                this.forceUpdate();
+	                break;
+	            case 4:
+	                this.players = turns.users;
+	                this.turns = turns.turns;
+	                this.stage = 3;
+	                this.forceUpdate();
+	                break;
+	            case 5:
+	                this.stage = 0;
 	                this.forceUpdate();
 	                break;
 	            default:
@@ -110,8 +122,9 @@
 	            case 1:
 	                return React.createElement(game_1.default, {turns: [], users: this.users, callback: this.getResult.bind(this)});
 	            case 2:
-	                var leaderboard = localstore_1.getLeaderboardRecords();
-	                return React.createElement(leaderboard_1.default, {message: this.message, callback: this.getResult.bind(this), leaderboard: leaderboard});
+	                return React.createElement(leaderboard_1.default, {message: this.message, callback: this.getResult.bind(this)});
+	            case 3:
+	                return React.createElement(game_1.default, {turns: this.turns, users: this.players, callback: this.getResult.bind(this)});
 	            default:
 	                return null;
 	        }
@@ -938,16 +951,17 @@
 	        this.cells = new Array(9);
 	        this.turns = [];
 	        this.playMode = false;
+	        // if(this.turns.length > 0 ) this.playMode = true
 	        // [this.user1,this.user2] =this.props.users
 	    }
 	    Game.prototype.componentDidMount = function () {
-	        console.log('yo');
 	        this.user1.classList.add(game_style_1.jss.underline);
 	        if (this.props.turns.length > 0)
 	            this.play();
 	    };
 	    Game.prototype.play = function () {
 	        var _this = this;
+	        // console.log('play')
 	        this.playMode = true;
 	        var i = 0;
 	        var int = setInterval(function () {
@@ -971,9 +985,15 @@
 	        // does somebody win ?
 	        if (robot_1.win(this.turns)) {
 	            var user = (this.turns.length % 2) ? 0 : 1;
-	            console.log('the winner is ' + this.props.users[user]);
-	            this.props.callback(user + 1);
-	            // this.playMode = true
+	            // console.log('the winner is '+  this.props.users[user])
+	            // save to log
+	            if (!this.playMode) {
+	                this.playMode = true;
+	                setTimeout(this.props.callback.bind(this, user + 1, this.turns), 500);
+	            }
+	            else {
+	                setTimeout(this.props.callback.bind(this, 0, this.turns), 1500);
+	            }
 	            return;
 	        }
 	        if (robot_1.isGameEnded(this.turns))
@@ -988,10 +1008,12 @@
 	        this.makeTurn(sector);
 	    };
 	    Game.prototype.render = function () {
-	        return (React.createElement("div", {className: game_style_1.jss.game}, 
-	            React.createElement("table", null, this.drawBoard()), 
-	            React.createElement("table", null, this.drawUsers()), 
-	            React.createElement("style", null, game_style_1.Style.getStyles())));
+	        return (React.createElement("div", {className: game_style_1.jss.container}, 
+	            React.createElement("div", {className: game_style_1.jss.game}, 
+	                React.createElement("table", null, this.drawBoard()), 
+	                React.createElement("table", null, this.drawUsers()), 
+	                React.createElement("style", null, game_style_1.Style.getStyles()))
+	        ));
 	    };
 	    Game.prototype.drawBoard = function () {
 	        var _this = this;
@@ -1076,12 +1098,22 @@
 	"use strict";
 	var FreeStyle = __webpack_require__(5);
 	exports.Style = FreeStyle.create();
-	var width = 360;
+	var width = 340;
 	exports.jss = {
-	    game: exports.Style.registerStyle({
+	    container: exports.Style.registerStyle({
 	        position: 'absolute',
+	        top: '0px',
+	        left: '10px',
+	        width: '100%',
+	        height: '100%',
+	        display: 'table-cell',
+	        textAlign: 'center'
+	    }),
+	    game: exports.Style.registerStyle({
+	        position: 'relative',
 	        margin: 'auto',
-	        marginTop: '10%',
+	        width: '360px',
+	        marginTop: '20%',
 	    }),
 	    cell: exports.Style.registerStyle({
 	        // width: '120px',
@@ -1097,7 +1129,7 @@
 	    }),
 	    user: exports.Style.registerStyle({
 	        width: width / 2,
-	        color: 'white',
+	        color: '#AAAAAA',
 	        padding: '15px',
 	        display: 'table-cell',
 	        verticalAlign: 'middle',
@@ -1105,6 +1137,7 @@
 	        fontSize: '2rem'
 	    }),
 	    underline: exports.Style.registerStyle({
+	        color: 'white',
 	        textDecoration: 'underline'
 	    }),
 	};
@@ -1174,24 +1207,40 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var React = __webpack_require__(1);
+	var localstore_1 = __webpack_require__(12);
 	var leaderboard_style_1 = __webpack_require__(11);
 	var Leaderboard = (function (_super) {
 	    __extends(Leaderboard, _super);
 	    function Leaderboard(props) {
 	        _super.call(this, props);
+	        this.log = false;
+	        this.table = this.leaderboard();
+	        this.message = props.message;
 	    }
 	    // hContinue(event: MouseEvent){
 	    // }
+	    Leaderboard.prototype.showLog = function (name) {
+	        this.message = name;
+	        this.log = true;
+	        this.forceUpdate();
+	    };
+	    Leaderboard.prototype.play = function (record) {
+	        this.props.callback(4, record);
+	    };
 	    Leaderboard.prototype.render = function () {
 	        return (React.createElement("div", {className: leaderboard_style_1.jss.container}, 
-	            React.createElement("h1", null, this.props.message), 
-	            React.createElement("div", {className: leaderboard_style_1.jss.leaderboard}, this.leaderboard()), 
-	            React.createElement("button", {onClick: this.props.callback.bind(this, 3)}, "Continue"), 
+	            React.createElement("h1", null, this.message), 
+	            React.createElement("div", {className: leaderboard_style_1.jss.leaderboard}, (this.log) ? this.drawLog(this.message) : this.leaderboard()), 
+	            React.createElement("div", null, 
+	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.callback.bind(this, 5)}, "New Game"), 
+	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.callback.bind(this, 3)}, "Continue")), 
 	            React.createElement("style", null, leaderboard_style_1.Style.getStyles())));
 	    };
 	    Leaderboard.prototype.leaderboard = function () {
-	        var records = this.props.leaderboard.map(function (val, idx) {
-	            return (React.createElement("tr", {key: idx}, 
+	        var _this = this;
+	        var lb = localstore_1.getLeaderboardRecords();
+	        var records = lb.map(function (val, idx) {
+	            return (React.createElement("tr", {key: idx, onClick: function (e) { return _this.showLog(val.name); }}, 
 	                React.createElement("td", null, val.name), 
 	                React.createElement("td", null, val.w), 
 	                React.createElement("td", null, val.l)));
@@ -1202,6 +1251,26 @@
 	                    React.createElement("td", null, "name"), 
 	                    React.createElement("td", null, "w"), 
 	                    React.createElement("td", null, "l")), 
+	                records)
+	        ));
+	    };
+	    // draw users data log
+	    Leaderboard.prototype.drawLog = function (name) {
+	        var _this = this;
+	        var logdata = localstore_1.getLogDataByName(name);
+	        var records = logdata.map(function (val, idx) {
+	            var date = new Date(val.date);
+	            var timestr = date.toDateString().substr(4, 7) + date.toTimeString().substr(0, 8);
+	            var users = val.users.join(' - ');
+	            return (React.createElement("tr", {key: idx, onClick: function (e) { return _this.play(val); }}, 
+	                React.createElement("td", null, timestr), 
+	                React.createElement("td", null, users)));
+	        });
+	        return (React.createElement("table", {className: leaderboard_style_1.jss.table}, 
+	            React.createElement("tbody", null, 
+	                React.createElement("tr", {className: leaderboard_style_1.jss.tableheader}, 
+	                    React.createElement("td", null, "date"), 
+	                    React.createElement("td", null, "users")), 
 	                records)
 	        ));
 	    };
@@ -1224,18 +1293,22 @@
 	    }),
 	    leaderboard: exports.Style.registerStyle({
 	        margin: ' 30px auto',
-	        height: '450px',
+	        height: '400px',
 	        overflow: 'auto',
-	        width: '360px',
+	        width: '320px',
 	        background: 'rgba(100,100,100,.05)'
 	    }),
 	    table: exports.Style.registerStyle({
 	        width: '100%',
+	        cursor: 'pointer'
 	    }),
 	    tableheader: exports.Style.registerStyle({
 	        fontWeight: 'bold',
 	        borderBottom: '1px solid silver',
 	        padding: '5px'
+	    }),
+	    button: exports.Style.registerStyle({
+	        width: '120px'
 	    })
 	};
 
@@ -1302,6 +1375,31 @@
 	    return records;
 	}
 	exports.getLeaderboardRecords = getLeaderboardRecords;
+	function getLogDataByName(name) {
+	    var data = getLogData();
+	    return data.filter(function (val) { return val.name == name; })
+	        .sort(function (a, b) { return b.date - a.date; });
+	}
+	exports.getLogDataByName = getLogDataByName;
+	function writeToLog(logData) {
+	    var data = getLogData();
+	    data.push(logData);
+	    localStorage['log'] = JSON.stringify(data);
+	}
+	exports.writeToLog = writeToLog;
+	function getLogData() {
+	    var data = [];
+	    var store = localStorage['log'];
+	    if (!store)
+	        return [];
+	    try {
+	        data = JSON.parse(store) || [];
+	    }
+	    catch (e) {
+	        console.error(e);
+	    }
+	    return data;
+	}
 
 
 /***/ }
