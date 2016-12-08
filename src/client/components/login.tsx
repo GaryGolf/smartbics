@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {Style, jss} from './login.style'
 
-interface Props {users: string[]}
+interface Props {users: string[], callback: any}
 interface State {}
 export default class Login extends React.Component <Props, State>{
 
@@ -61,7 +61,7 @@ export default class Login extends React.Component <Props, State>{
     userAutocomplete(inputNum: number){
         const input = (inputNum == 1 ) ? this.input1 : this.input2
         const length = input.value.length
-        if(length < 3 ) return
+        if(length < 2 ) return
         for(var i = 0; i < this.props.users.length; i++)
             if(this.props.users[i].indexOf(input.value) == 0) {
                 input.value = this.props.users[i]
@@ -71,7 +71,8 @@ export default class Login extends React.Component <Props, State>{
     }
 
     bingo(){
-        console.log(`user1 ${this.input1.value} user2 ${this.input2.value}`)
+        this.props.callback([this.input1.value, this.input2.value])
+        // console.log(`user1 ${this.input1.value} user2 ${this.input2.value}`)
     }
 
     render() {

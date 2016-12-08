@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {Style, jss} from './game.style'
-import Robot from './robot'
+import {win, isGameEnded} from './robot'
 
-interface Props {turns: number[], users: string[]}
+interface Props {turns: number[], users: string[], callback: any}
 interface State {}
 export default class Game extends React.Component <Props, State>{
     private cells: HTMLDivElement[]
@@ -47,13 +47,15 @@ export default class Game extends React.Component <Props, State>{
         
         const className = (this.turns.length%2) ? 'fa fa-times fa-3x' : 'fa fa-circle fa-3x'
         this.cells[sector].children.item(0).className = className
-        const robot = new Robot(this.turns)
-        if(robot.won()) {
-            const name = (this.turns.length%2) ? this.props.users[0] : this.props.users[1]
-            console.log('the winner is '+  name)
-            this.playMode = true
+        // does somebody win ?
+        if(win(this.turns)) {
+            const user = (this.turns.length%2) ? 0 : 1
+            console.log('the winner is '+  this.props.users[user])
+            this.props.callback(user + 1)
+            // this.playMode = true
             return
         }
+        if(isGameEnded(this.turns)) this.props.callback(0) // draw
         this.user1.classList.toggle(jss.underline)
         this.user2.classList.toggle(jss.underline)
     }

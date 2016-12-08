@@ -1,22 +1,26 @@
-export default class Robot {
-    private turns: number[]
-    constructor(turns: number[]){
-        this.turns = turns
-    }
-    won() {
-        const cases = [
-            [0,1,2],[3,4,5],[6,7,8],
-            [0,3,6],[1,4,5],[2,5,8],
-            [0,4,8],[2,4,6]
-        ]
-        // filter last user turns
-        //the turns of the user , who made his turn last
-        const turns = this.turns.filter((val, idx) => (this.turns.length % 2 + idx % 2 == 1)).sort()
-        if(turns.length < 3) return false
 
-        return inspectAllCases(cases,createArrayOfTripples(turns))
-    }
+
+// returns true if player, who has made last turn wins
+export function win(turns: number[]):boolean {
+    const cases = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,5],[2,5,8],
+        [0,4,8],[2,4,6]
+    ]
+    // filter last user turns
+    //the turns of the user , who made his turn last
+    const fturns = turns.filter((val, idx) => (turns.length % 2 + idx % 2 == 1)).sort()
+    if(fturns.length < 3) return false
+
+    return inspectAllCases(cases,createArrayOfTripples(fturns))
 }
+export function isGameEnded(turns: number[]):boolean {
+    console.log('ended?'+turns.length)
+    if(turns.length == 9) return true
+    return false
+}
+
+
 //modify  array from [1,2,3,4] => [[1,2,3],[1,2,4],[1,3,4],[2,3,4]]
 function createArrayOfTripples(arr: number[]): number[][]{
     let tripples:number[][] = []
