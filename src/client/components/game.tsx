@@ -2,15 +2,18 @@ import * as React from 'react'
 import {Style, jss} from './game.style'
 import {win, isGameEnded,makeDecision} from './robot'
 
-interface Props {turns: number[], users: string[], callback: any}
+
+interface Props {turns: number[], users: string[], onDispatch: any}
 interface State {}
+
 export default class Game extends React.Component <Props, State>{
+
     private cells: HTMLDivElement[]
     private turns: number[]
     private playMode: boolean
     private user1: HTMLDivElement
     private user2: HTMLDivElement
-    private turnsOrder: boolean // if true user1 plays first
+    
     
     constructor(props: Props) {
         super(props)
@@ -25,8 +28,9 @@ export default class Game extends React.Component <Props, State>{
         else if(this.nameOfCurrentUser() == 'computer')
             this.makeTurn(makeDecision(this.turns))
     }
+
     play(){
-        // console.log('play')
+        
         this.playMode = true
         var i = 0
         const int = setInterval(()=>{
@@ -37,6 +41,7 @@ export default class Game extends React.Component <Props, State>{
             }
         },1500)
     }
+
     makeTurn(sector: number){
         // empty sector?
         if(this.turns.indexOf(sector) >=0) return
@@ -48,17 +53,23 @@ export default class Game extends React.Component <Props, State>{
         this.cells[sector].children.item(0).className = className
         // does somebody win ?
         if(win(this.turns)) {
-            const user = (this.turns.length%2) ? 0 : 1
             // save to log
             if(!this.playMode) {
-                this.playMode = true
-                setTimeout(this.props.callback.bind(this,user + 1,this.turns),300)
+                
+                const payload = {
+                    turns:  this.turns,
+                    users:  this.props.users,
+                    winner: (this.turns,length%2) ? this.props.users[1] : this.props.users[0],
+                    looser: (this.turns,length%2) ? this.props.users[0] : this.props.users[1],
+                }
+                setTimeout(this.props.onDispatch.bind(this,'CONGRAT_WINNER', payload),300)
             }else{
-                setTimeout(this.props.callback.bind(this,0,this.turns),1500)
+                // setTimeout(this.props.callback.bind(this,0,this.turns),1500)
+                setTimeout(this.props.onDispatch.bind(this,'SHOW_LEADERBAORD'),1500)
             }
             return
         }
-        if(isGameEnded(this.turns)) return this.props.callback(0) // draw
+        if(isGameEnded(this.turns)) return this.props.onDispatch('SHOW_LEADERBAORD') // draw
         this.user1.classList.toggle(jss.underline)
         this.user2.classList.toggle(jss.underline)
         if(this.nameOfCurrentUser() == 'computer'){
@@ -67,11 +78,13 @@ export default class Game extends React.Component <Props, State>{
             this.makeTurn(decision)
         }
     }
+
     // user click handler
     turn(sector: number){
         if(this.playMode) return
         this.makeTurn(sector)
     }
+
     render(){
         return (
             <div className={jss.container}>
@@ -83,6 +96,7 @@ export default class Game extends React.Component <Props, State>{
             </div>
         )
     }
+
     drawBoard(){
         return (
             <tbody>
@@ -135,6 +149,7 @@ export default class Game extends React.Component <Props, State>{
             </tbody>
         )
     }
+    
     nameOfCurrentUser(){
         return (this.turns.length%2) ? this.props.users[1] : this.props.users[0]
     }

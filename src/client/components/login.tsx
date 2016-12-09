@@ -1,7 +1,8 @@
 import * as React from 'react'
 import {Style, jss} from './login.style'
 
-interface Props {users: string[], callback: any}
+
+interface Props {users: string[], onDispatch: any}
 interface State {}
 export default class Login extends React.Component <Props, State>{
 
@@ -27,7 +28,7 @@ export default class Login extends React.Component <Props, State>{
             case 'Enter' :
                 // user1 name should not be empty
                 if(i1.value == '') break    
-                if(i2.value != '' && i1.value != i2.value ) return this.bingo()
+                if(i2.value != '' && i1.value != i2.value ) return this.loadGame()
                 i2.disabled = false
                 // maybe user1 wants to play with computer?
                 if(i1.value != 'computer') i2.value = 'computer'
@@ -50,7 +51,7 @@ export default class Login extends React.Component <Props, State>{
                 if(i1.value == '' || i2.value == '' || i1.value == i2.value) break 
                 i2.setSelectionRange(0,0)
                 i2.blur()
-                this.bingo()
+                this.loadGame()
             case 'Backspace' :
                 break
             default:
@@ -70,9 +71,9 @@ export default class Login extends React.Component <Props, State>{
             }  
     }
 
-    bingo(){
-        this.props.callback([this.input1.value, this.input2.value])
-        // console.log(`user1 ${this.input1.value} user2 ${this.input2.value}`)
+    loadGame(){
+        const users = {users:[this.input1.value, this.input2.value]}
+        this.props.onDispatch('GET_USERS',users)
     }
 
     render() {

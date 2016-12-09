@@ -50,6 +50,14 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var __assign = (this && this.__assign) || Object.assign || function(t) {
+	    for (var s, i = 1, n = arguments.length; i < n; i++) {
+	        s = arguments[i];
+	        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+	            t[p] = s[p];
+	    }
+	    return t;
+	};
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(2);
 	var login_1 = __webpack_require__(3);
@@ -64,64 +72,94 @@
 	        this.stage = 0;
 	    }
 	    App.prototype.componentWillMount = function () {
-	        // console.log('will')
 	        // localStorage.clear()
 	    };
-	    App.prototype.getUsers = function (users) {
-	        this.users = users;
-	        this.stage = 1;
-	        this.forceUpdate();
-	    };
-	    App.prototype.getResult = function (status, turns) {
-	        switch (status) {
-	            // draw
-	            case 0:
-	                // switch users
-	                this.users = [this.users[1], this.users[0]];
-	                this.stage = 2;
-	                this.message = 'lets play again';
-	                this.forceUpdate();
-	                break;
-	            case 1:
-	            case 2:
-	                // someone wins
-	                var winner = this.users[status - 1];
-	                var looser = (status - 1 == 0) ? this.users[1] : this.users[0];
-	                this.message = winner + ' wins!';
-	                // save stats
-	                localstore_1.updateRecords(winner, looser);
-	                localstore_1.writeToLog({ name: winner, date: Date.now(), users: this.users, turns: turns });
-	                this.stage = 2;
-	                this.forceUpdate();
-	                break;
-	            case 3:
-	                this.users = [this.users[1], this.users[0]];
+	    App.prototype.dispatch = function (action, payload) {
+	        switch (action) {
+	            case 'GET_USERS':
 	                this.stage = 1;
-	                this.forceUpdate();
+	                this.users = payload.users;
 	                break;
-	            case 4:
-	                this.players = turns.users;
-	                this.turns = turns.turns;
-	                this.stage = 3;
-	                this.forceUpdate();
+	            case 'SHOW_LEADERBAORD':
+	                this.stage = 2;
+	                // this.users  = [this.users[1], this.users[0]]
+	                this.message = 'lets play again';
 	                break;
-	            case 5:
+	            case 'START_GAME':
+	                this.stage = 1;
+	                this.users = [this.users[1], this.users[0]];
+	                break;
+	            case 'NEW_GAME':
 	                this.stage = 0;
-	                this.forceUpdate();
+	                break;
+	            case 'CONGRAT_WINNER':
+	                this.stage = 2;
+	                this.message = payload.winner + ' wins!';
+	                localstore_1.updateRecords(payload.winner, payload.looser);
+	                localstore_1.writeToLog({ name: payload.winner, date: Date.now(), users: this.users, turns: payload.turns });
+	                break;
+	            case 'REPLAY_GAME':
+	                this.stage = 3;
+	                this.players = payload.users;
+	                this.turns = payload.turns;
 	                break;
 	            default:
 	        }
+	        this.forceUpdate();
 	    };
+	    // getResult(status: number, turns?: any){
+	    //     switch(status){
+	    //         // draw
+	    //         case 0 :
+	    //             // switch users
+	    //             this.users  = [this.users[1], this.users[0]]
+	    //             this.stage = 2
+	    //             this.message = 'lets play again' 
+	    //             this.forceUpdate()
+	    //             break
+	    //         case 1 :
+	    //         case 2 :
+	    //             // someone wins
+	    //             const winner = this.users[status-1]
+	    //             const looser = (status-1 == 0) ? this.users[1] : this.users[0]
+	    //             this.message = winner + ' wins!'
+	    //             // save stats
+	    //             updateRecords(winner, looser)
+	    //             writeToLog({name: winner,date: Date.now(),users: this.users,turns})
+	    //             this.stage = 2
+	    //             this.forceUpdate() 
+	    //             break
+	    //         case 3 : // play again
+	    //             this.users  = [this.users[1], this.users[0]]
+	    //             this.stage = 1
+	    //             this.forceUpdate()
+	    //             break
+	    //         case 4 :  // replay old game
+	    //             this.players = turns.users
+	    //             this.turns = turns.turns
+	    //             this.stage = 3
+	    //             this.forceUpdate()
+	    //             break
+	    //         case 5 : // new game
+	    //             this.stage = 0
+	    //             this.forceUpdate()
+	    //             break;
+	    //         default :
+	    //     }
+	    // }
 	    App.prototype.render = function () {
+	        var dispatch = {
+	            onDispatch: this.dispatch.bind(this)
+	        };
 	        switch (this.stage) {
 	            case 0:
-	                return React.createElement(login_1.default, {users: localstore_1.getNames(), callback: this.getUsers.bind(this)});
+	                return React.createElement(login_1.default, __assign({users: localstore_1.getNames()}, dispatch));
 	            case 1:
-	                return React.createElement(game_1.default, {turns: [], users: this.users, callback: this.getResult.bind(this)});
+	                return React.createElement(game_1.default, __assign({turns: [], users: this.users}, dispatch));
 	            case 2:
-	                return React.createElement(leaderboard_1.default, {message: this.message, callback: this.getResult.bind(this)});
+	                return React.createElement(leaderboard_1.default, __assign({message: this.message}, dispatch));
 	            case 3:
-	                return React.createElement(game_1.default, {turns: this.turns, users: this.players, callback: this.getResult.bind(this)});
+	                return React.createElement(game_1.default, __assign({turns: this.turns, users: this.players}, dispatch));
 	            default:
 	                return null;
 	        }
@@ -129,9 +167,6 @@
 	    return App;
 	}(React.Component));
 	ReactDOM.render(React.createElement(App, null), document.getElementById('layout'));
-	// ReactDOM.render(<Game turns={[]} users={['vanya','tanya']}/>,document.getElementById('layout'))
-	// ReactDOM.render(<Game turns={[2,3,5,7,8]} users={['vanya','tanya']}/>,document.getElementById('layout'))
-	// ReactDOM.render(<Login users={['computer','beavis','butthead']}/>,document.getElementById('layout'))
 
 
 /***/ },
@@ -184,7 +219,7 @@
 	                if (i1.value == '')
 	                    break;
 	                if (i2.value != '' && i1.value != i2.value)
-	                    return this.bingo();
+	                    return this.loadGame();
 	                i2.disabled = false;
 	                // maybe user1 wants to play with computer?
 	                if (i1.value != 'computer')
@@ -208,7 +243,7 @@
 	                    break;
 	                i2.setSelectionRange(0, 0);
 	                i2.blur();
-	                this.bingo();
+	                this.loadGame();
 	            case 'Backspace':
 	                break;
 	            default:
@@ -227,9 +262,9 @@
 	                return;
 	            }
 	    };
-	    Login.prototype.bingo = function () {
-	        this.props.callback([this.input1.value, this.input2.value]);
-	        // console.log(`user1 ${this.input1.value} user2 ${this.input2.value}`)
+	    Login.prototype.loadGame = function () {
+	        var users = { users: [this.input1.value, this.input2.value] };
+	        this.props.onDispatch('GET_USERS', users);
 	    };
 	    Login.prototype.render = function () {
 	        var _this = this;
@@ -959,7 +994,6 @@
 	    };
 	    Game.prototype.play = function () {
 	        var _this = this;
-	        // console.log('play')
 	        this.playMode = true;
 	        var i = 0;
 	        var int = setInterval(function () {
@@ -982,19 +1016,24 @@
 	        this.cells[sector].children.item(0).className = className;
 	        // does somebody win ?
 	        if (robot_1.win(this.turns)) {
-	            var user = (this.turns.length % 2) ? 0 : 1;
 	            // save to log
 	            if (!this.playMode) {
-	                this.playMode = true;
-	                setTimeout(this.props.callback.bind(this, user + 1, this.turns), 300);
+	                var payload = {
+	                    turns: this.turns,
+	                    users: this.props.users,
+	                    winner: (this.turns, length % 2) ? this.props.users[1] : this.props.users[0],
+	                    looser: (this.turns, length % 2) ? this.props.users[0] : this.props.users[1],
+	                };
+	                setTimeout(this.props.onDispatch.bind(this, 'CONGRAT_WINNER', payload), 300);
 	            }
 	            else {
-	                setTimeout(this.props.callback.bind(this, 0, this.turns), 1500);
+	                // setTimeout(this.props.callback.bind(this,0,this.turns),1500)
+	                setTimeout(this.props.onDispatch.bind(this, 'SHOW_LEADERBAORD'), 1500);
 	            }
 	            return;
 	        }
 	        if (robot_1.isGameEnded(this.turns))
-	            return this.props.callback(0); // draw
+	            return this.props.onDispatch('SHOW_LEADERBAORD'); // draw
 	        this.user1.classList.toggle(game_style_1.jss.underline);
 	        this.user2.classList.toggle(game_style_1.jss.underline);
 	        if (this.nameOfCurrentUser() == 'computer') {
@@ -1324,29 +1363,28 @@
 	var leaderboard_style_1 = __webpack_require__(12);
 	var Leaderboard = (function (_super) {
 	    __extends(Leaderboard, _super);
+	    //private name: string
 	    function Leaderboard(props) {
 	        _super.call(this, props);
 	        this.log = false;
 	        this.table = this.leaderboard();
 	        this.message = props.message;
 	    }
-	    // hContinue(event: MouseEvent){
-	    // }
 	    Leaderboard.prototype.showLog = function (name) {
 	        this.message = name;
 	        this.log = true;
 	        this.forceUpdate();
 	    };
 	    Leaderboard.prototype.play = function (record) {
-	        this.props.callback(4, record);
+	        this.props.onDispatch('REPLAY_GAME', record);
 	    };
 	    Leaderboard.prototype.render = function () {
 	        return (React.createElement("div", {className: leaderboard_style_1.jss.container}, 
 	            React.createElement("h1", null, this.message), 
 	            React.createElement("div", {className: leaderboard_style_1.jss.leaderboard}, (this.log) ? this.drawLog(this.message) : this.leaderboard()), 
 	            React.createElement("div", null, 
-	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.callback.bind(this, 5)}, "New Game"), 
-	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.callback.bind(this, 3)}, "Continue")), 
+	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, 'NEW_GAME')}, "New Game"), 
+	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, 'START_GAME')}, "Continue")), 
 	            React.createElement("style", null, leaderboard_style_1.Style.getStyles())));
 	    };
 	    Leaderboard.prototype.leaderboard = function () {

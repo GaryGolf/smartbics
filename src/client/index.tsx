@@ -12,82 +12,114 @@ interface Props {}
 interface State {}
 
 class App extends React.Component<Props,State>{
+    
     private stage: number
     private users: string[]
     private message: string
     private turns: number[]
     private players: string[]
+
     constructor(props: Props){
         super(props)
         this.message = 'hello'
         this.stage = 0
     }
     componentWillMount(){
-        // console.log('will')
         // localStorage.clear()
     }
 
-    getUsers(users: string[]){
-        this.users = users
-        this.stage = 1
-        this.forceUpdate()
-    }
+    dispatch(action: string, payload: any){
 
-
-
-    getResult(status: number, turns?: any){
-        
-        switch(status){
-            // draw
-            case 0 :
-                // switch users
-                this.users  = [this.users[1], this.users[0]]
-                this.stage = 2
-                this.message = 'lets play again' 
-                this.forceUpdate()
-                break
-            case 1 :
-            case 2 :
-                // someone wins
-                const winner = this.users[status-1]
-                const looser = (status-1 == 0) ? this.users[1] : this.users[0]
-                this.message = winner + ' wins!'
-                // save stats
-                updateRecords(winner, looser)
-                writeToLog({name: winner,date: Date.now(),users: this.users,turns})
-                this.stage = 2
-                this.forceUpdate() 
-                break
-            case 3 : // play again
-                this.users  = [this.users[1], this.users[0]]
+        switch(action){
+            case 'GET_USERS' :
                 this.stage = 1
-                this.forceUpdate()
+                this.users = payload.users
                 break
-            case 4 :  // replay old game
-                this.players = turns.users
-                this.turns = turns.turns
-                this.stage = 3
-                this.forceUpdate()
+            case 'SHOW_LEADERBAORD' :
+                this.stage = 2
+                // this.users  = [this.users[1], this.users[0]]
+                this.message = 'lets play again'
                 break
-            case 5 : // new game
+            case 'START_GAME' :
+                this.stage = 1
+                this.users  = [this.users[1], this.users[0]]
+                break
+            case 'NEW_GAME' :
                 this.stage = 0
-                this.forceUpdate()
-                break;
+                break
+            case 'CONGRAT_WINNER' :
+                this.stage = 2
+                this.message = payload.winner+' wins!'
+                updateRecords(payload.winner, payload.looser)
+                writeToLog({name: payload.winner,date: Date.now(),users: this.users,turns: payload.turns})
+                break
+            case 'REPLAY_GAME' :
+                this.stage = 3
+                this.players = payload.users
+                this.turns = payload.turns
+                break
             default :
         }
-    }
+        this.forceUpdate()
+    }   
+  
+    // getResult(status: number, turns?: any){
+        
+    //     switch(status){
+    //         // draw
+    //         case 0 :
+    //             // switch users
+    //             this.users  = [this.users[1], this.users[0]]
+    //             this.stage = 2
+    //             this.message = 'lets play again' 
+    //             this.forceUpdate()
+    //             break
+    //         case 1 :
+    //         case 2 :
+    //             // someone wins
+    //             const winner = this.users[status-1]
+    //             const looser = (status-1 == 0) ? this.users[1] : this.users[0]
+    //             this.message = winner + ' wins!'
+    //             // save stats
+    //             updateRecords(winner, looser)
+    //             writeToLog({name: winner,date: Date.now(),users: this.users,turns})
+    //             this.stage = 2
+    //             this.forceUpdate() 
+    //             break
+    //         case 3 : // play again
+    //             this.users  = [this.users[1], this.users[0]]
+    //             this.stage = 1
+    //             this.forceUpdate()
+    //             break
+    //         case 4 :  // replay old game
+    //             this.players = turns.users
+    //             this.turns = turns.turns
+    //             this.stage = 3
+    //             this.forceUpdate()
+    //             break
+    //         case 5 : // new game
+    //             this.stage = 0
+    //             this.forceUpdate()
+    //             break;
+    //         default :
+    //     }
+    // }
 
     render(){
+
+        const dispatch = {
+            onDispatch: this.dispatch.bind(this)
+        }
        
         switch(this.stage) {
-            case 0 :
-                return <Login users={getNames()} callback={this.getUsers.bind(this)}/>
-            case 1 :
-                return <Game turns={[]} users={this.users} callback={this.getResult.bind(this)}/>
-            case 2 :
-                return <Leaderboard message={this.message} callback={this.getResult.bind(this)} />
-            case 3 :
-                return <Game turns={this.turns} users={this.players} callback={this.getResult.bind(this)}/>
+            case 0 : // users login 
+                return <Login users={getNames()} {...dispatch}/>
+            case 1 : // game
+                return <Game turns={[]} users={this.users} {...dispatch}/>
+            case 2 : // show leaderboard
+                return <Leaderboard message={this.message} {...dispatch} />
+            case 3 :  // replay game
+                return <Game turns={this.turns} users={this.players} {...dispatch}/>
             default :
              return null
         }    
@@ -96,6 +128,3 @@ class App extends React.Component<Props,State>{
 
 
 ReactDOM.render(<App/>,document.getElementById('layout'))
-// ReactDOM.render(<Game turns={[]} users={['vanya','tanya']}/>,document.getElementById('layout'))
-// ReactDOM.render(<Game turns={[2,3,5,7,8]} users={['vanya','tanya']}/>,document.getElementById('layout'))
-// ReactDOM.render(<Login users={['computer','beavis','butthead']}/>,document.getElementById('layout'))

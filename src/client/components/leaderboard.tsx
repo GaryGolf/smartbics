@@ -2,23 +2,23 @@ import * as React from 'react'
 import {LeaderboardRecord, getLeaderboardRecords, getLogDataByName , LeaderboardLog} from './localstore'
 import {Style, jss} from './leaderboard.style'
 
-interface Props { message: string, callback: any }
+
+interface Props { message: string, onDispatch: any }
 interface State {}
 
 export default class Leaderboard extends React.Component<Props,State>{
+   
    private table: JSX.Element
    private message: string
    private log: boolean
-   private name: string
+   //private name: string
+
     constructor(props: Props){
         super(props)
         this.log = false
         this.table = this.leaderboard()
         this.message = props.message
     }
-    // hContinue(event: MouseEvent){
-
-    // }
 
     showLog(name: string) {
         this.message = name
@@ -26,7 +26,7 @@ export default class Leaderboard extends React.Component<Props,State>{
         this.forceUpdate()
     }
     play(record: LeaderboardLog){
-        this.props.callback(4,record)
+        this.props.onDispatch('REPLAY_GAME',record)
     }
 
     render(){
@@ -38,8 +38,8 @@ export default class Leaderboard extends React.Component<Props,State>{
                    { (this.log) ? this.drawLog(this.message) : this.leaderboard()}
                 </div>
                 <div>
-                <button className={jss.button} onClick={this.props.callback.bind(this,5)}>New Game</button>
-                <button className={jss.button} onClick={this.props.callback.bind(this,3)}>Continue</button>
+                <button className={jss.button} onClick={this.props.onDispatch.bind(this,'NEW_GAME')}>New Game</button>
+                <button className={jss.button} onClick={this.props.onDispatch.bind(this,'START_GAME')}>Continue</button>
                 </div>
                 <style>{Style.getStyles()}</style>
             </div>
