@@ -27,12 +27,10 @@ export function updateRecords(winner: string, looser: string): void {
         if(val.name == winner ) {
             winnerUpdated = true
             val.w++ 
-            console.log(winner+' updated')
             return val
         } else if(val.name == looser) {
             looserUpdated = true
             val.l++
-            console.log(looser+' updated')
             return val
         } else  return val
     }).sort((a,b) => b.w - a.w)

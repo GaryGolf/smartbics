@@ -26,11 +26,14 @@ export const jss = {
     }),
     tableheader: Style.registerStyle({
         fontWeight: 'bold',
+        fontSize: '1.7rem',
         borderBottom: '1px solid silver',
         padding: '5px'
     }),
     button: Style.registerStyle({
-       width: '120px'
+       width: '120px',
+       color: 'gray',
+       textShadow: '1px 1px 2px rgba(24,56,100,.7)'
     })
 
 

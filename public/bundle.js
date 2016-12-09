@@ -55,18 +55,17 @@
 	var login_1 = __webpack_require__(3);
 	var game_1 = __webpack_require__(7);
 	var leaderboard_1 = __webpack_require__(10);
-	var localstore_1 = __webpack_require__(12);
+	var localstore_1 = __webpack_require__(11);
 	var App = (function (_super) {
 	    __extends(App, _super);
 	    function App(props) {
 	        _super.call(this, props);
 	        this.message = 'hello';
-	        this.stage = 2;
+	        this.stage = 0;
 	    }
 	    App.prototype.componentWillMount = function () {
 	        // console.log('will')
 	        // localStorage.clear()
-	        console.log(localStorage['log']);
 	    };
 	    App.prototype.getUsers = function (users) {
 	        this.users = users;
@@ -951,13 +950,13 @@
 	        this.cells = new Array(9);
 	        this.turns = [];
 	        this.playMode = false;
-	        // if(this.turns.length > 0 ) this.playMode = true
-	        // [this.user1,this.user2] =this.props.users
 	    }
 	    Game.prototype.componentDidMount = function () {
 	        this.user1.classList.add(game_style_1.jss.underline);
 	        if (this.props.turns.length > 0)
 	            this.play();
+	        else if (this.nameOfCurrentUser() == 'computer')
+	            this.makeTurn(robot_1.makeDecision(this.turns));
 	    };
 	    Game.prototype.play = function () {
 	        var _this = this;
@@ -985,11 +984,10 @@
 	        // does somebody win ?
 	        if (robot_1.win(this.turns)) {
 	            var user = (this.turns.length % 2) ? 0 : 1;
-	            // console.log('the winner is '+  this.props.users[user])
 	            // save to log
 	            if (!this.playMode) {
 	                this.playMode = true;
-	                setTimeout(this.props.callback.bind(this, user + 1, this.turns), 500);
+	                setTimeout(this.props.callback.bind(this, user + 1, this.turns), 300);
 	            }
 	            else {
 	                setTimeout(this.props.callback.bind(this, 0, this.turns), 1500);
@@ -1000,6 +998,13 @@
 	            this.props.callback(0); // draw
 	        this.user1.classList.toggle(game_style_1.jss.underline);
 	        this.user2.classList.toggle(game_style_1.jss.underline);
+	        if (this.nameOfCurrentUser() == 'computer') {
+	            if (this.playMode)
+	                return;
+	            console.log('computer');
+	            var decision = robot_1.makeDecision(this.turns);
+	            this.makeTurn(decision);
+	        }
 	    };
 	    // user click handler
 	    Game.prototype.turn = function (sector) {
@@ -1085,6 +1090,9 @@
 	                ))
 	        ));
 	    };
+	    Game.prototype.nameOfCurrentUser = function () {
+	        return (this.turns.length % 2) ? this.props.users[1] : this.props.users[0];
+	    };
 	    return Game;
 	}(React.Component));
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -1148,6 +1156,83 @@
 /***/ function(module, exports) {
 
 	"use strict";
+	function makeDecision(turns) {
+	    var turn = turns.length;
+	    // check user turns for danger situation
+	    var danger = isDanger(turns);
+	    if (danger != -1)
+	        return danger;
+	    switch (turn) {
+	        case 2:
+	            // is opponent has a side
+	            var oppTurn = [1, 3, 5, 7].indexOf(turns[1]);
+	            if (oppTurn >= 0)
+	                return [8, 2, 6, 0][oppTurn];
+	        // if he has a corner 
+	        case 3:
+	            var thr = three(turns);
+	            if (thr != -1)
+	                return thr;
+	            break;
+	        default:
+	            break;
+	    }
+	    return getFreeCell(turns);
+	}
+	exports.makeDecision = makeDecision;
+	// important loose prevention turn
+	function three(turns) {
+	    var cases = [
+	        [0, 8], [1, 6], [1, 3], [1, 5], [5, 7], [3, 7],
+	        [1, 6], [0, 5], [2, 7], [3, 8], [1, 8], [5, 6], [0, 7], [2, 3]
+	    ];
+	    var relieve = [
+	        [3, 5], [1, 7], [0, 2], [2, 8], [6, 8], [0, 6],
+	        [0, 3], [1, 2], [5, 8], [6, 7], [2, 5], [7, 8], [3, 6], [0, 1]
+	    ];
+	    if (turns.length < 3)
+	        return -1;
+	    // check user turns for danger situation
+	    // return solution
+	    var userTurns = lastUserTurns(turns);
+	    for (var i = 0; i < userTurns.length - 1; i++)
+	        for (var j = 1; j < userTurns.length; j++)
+	            for (var k = 0; k < cases.length; k++) {
+	                if (userTurns[i] == cases[k][0] &&
+	                    userTurns[j] == cases[k][1])
+	                    return (turns.indexOf(relieve[k][0]) == -1) ? relieve[k][0] : relieve[k][1];
+	            }
+	    return -1;
+	}
+	function isDanger(turns) {
+	    var cases = [
+	        [0, 1], [2, 5], [7, 8], [6, 3], [0, 3], [6, 7], [5, 8], [1, 2],
+	        [0, 2], [2, 8], [6, 8], [0, 6], [1, 4], [4, 5], [4, 7], [3, 4],
+	        [1, 7], [3, 5], [0, 4], [2, 4], [4, 8], [4, 6], [0, 8], [2, 6]
+	    ];
+	    var relieve = [
+	        2, 8, 6, 0, 6, 8, 2, 0,
+	        1, 5, 7, 3, 7, 3, 1, 5,
+	        4, 4, 8, 6, 0, 2, 4, 4
+	    ];
+	    if (turns.length < 3)
+	        return -1;
+	    // check user turns for danger situation
+	    // return solution
+	    var userTurns = lastUserTurns(turns);
+	    for (var i = 0; i < userTurns.length - 1; i++)
+	        for (var j = 1; j < userTurns.length; j++)
+	            for (var k = 0; k < cases.length; k++) {
+	                if (userTurns[i] == cases[k][0] &&
+	                    userTurns[j] == cases[k][1] &&
+	                    turns.indexOf(relieve[k]) < 0)
+	                    return relieve[k];
+	            }
+	    return -1;
+	}
+	function lastUserTurns(turns) {
+	    return turns.filter(function (val, idx) { return (turns.length % 2 + idx % 2 == 1); }).sort();
+	}
 	// returns true if player, who has made last turn wins
 	function win(turns) {
 	    var cases = [
@@ -1170,6 +1255,29 @@
 	    return false;
 	}
 	exports.isGameEnded = isGameEnded;
+	// returns free cell center then corner then other then null
+	function getFreeCell(turns) {
+	    // center
+	    if (turns.indexOf(4) < 0)
+	        return 4;
+	    // corner
+	    var corners = subtract([0, 2, 6, 8], turns);
+	    if (corners.length > 0)
+	        return random(corners);
+	    //side
+	    var sides = subtract([1, 3, 5, 7], turns);
+	    if (sides.length > 0)
+	        return random(sides);
+	    return null;
+	}
+	exports.getFreeCell = getFreeCell;
+	// gets random number
+	function random(arr) {
+	    return arr[Math.floor(Math.random() * arr.length)];
+	}
+	function subtract(arr1, arr2) {
+	    return arr1.filter(function (val) { return arr2.indexOf(val) == -1; });
+	}
 	//modify  array from [1,2,3,4] => [[1,2,3],[1,2,4],[1,3,4],[2,3,4]]
 	function createArrayOfTripples(arr) {
 	    var tripples = [];
@@ -1207,8 +1315,8 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var React = __webpack_require__(1);
-	var localstore_1 = __webpack_require__(12);
-	var leaderboard_style_1 = __webpack_require__(11);
+	var localstore_1 = __webpack_require__(11);
+	var leaderboard_style_1 = __webpack_require__(12);
 	var Leaderboard = (function (_super) {
 	    __extends(Leaderboard, _super);
 	    function Leaderboard(props) {
@@ -1282,39 +1390,6 @@
 
 /***/ },
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var FreeStyle = __webpack_require__(5);
-	exports.Style = FreeStyle.create();
-	exports.jss = {
-	    container: exports.Style.registerStyle({
-	        color: 'silver'
-	    }),
-	    leaderboard: exports.Style.registerStyle({
-	        margin: ' 30px auto',
-	        height: '400px',
-	        overflow: 'auto',
-	        width: '320px',
-	        background: 'rgba(100,100,100,.05)'
-	    }),
-	    table: exports.Style.registerStyle({
-	        width: '100%',
-	        cursor: 'pointer'
-	    }),
-	    tableheader: exports.Style.registerStyle({
-	        fontWeight: 'bold',
-	        borderBottom: '1px solid silver',
-	        padding: '5px'
-	    }),
-	    button: exports.Style.registerStyle({
-	        width: '120px'
-	    })
-	};
-
-
-/***/ },
-/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1341,13 +1416,11 @@
 	        if (val.name == winner) {
 	            winnerUpdated = true;
 	            val.w++;
-	            console.log(winner + ' updated');
 	            return val;
 	        }
 	        else if (val.name == looser) {
 	            looserUpdated = true;
 	            val.l++;
-	            console.log(looser + ' updated');
 	            return val;
 	        }
 	        else
@@ -1400,6 +1473,42 @@
 	    }
 	    return data;
 	}
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var FreeStyle = __webpack_require__(5);
+	exports.Style = FreeStyle.create();
+	exports.jss = {
+	    container: exports.Style.registerStyle({
+	        color: 'silver'
+	    }),
+	    leaderboard: exports.Style.registerStyle({
+	        margin: ' 30px auto',
+	        height: '400px',
+	        overflow: 'auto',
+	        width: '320px',
+	        background: 'rgba(100,100,100,.05)'
+	    }),
+	    table: exports.Style.registerStyle({
+	        width: '100%',
+	        cursor: 'pointer'
+	    }),
+	    tableheader: exports.Style.registerStyle({
+	        fontWeight: 'bold',
+	        fontSize: '1.7rem',
+	        borderBottom: '1px solid silver',
+	        padding: '5px'
+	    }),
+	    button: exports.Style.registerStyle({
+	        width: '120px',
+	        color: 'gray',
+	        textShadow: '1px 1px 2px rgba(24,56,100,.7)'
+	    })
+	};
 
 
 /***/ }

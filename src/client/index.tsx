@@ -20,12 +20,11 @@ class App extends React.Component<Props,State>{
     constructor(props: Props){
         super(props)
         this.message = 'hello'
-        this.stage = 2
+        this.stage = 0
     }
     componentWillMount(){
         // console.log('will')
         // localStorage.clear()
-        console.log(localStorage['log'])
     }
 
     getUsers(users: string[]){

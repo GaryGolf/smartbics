@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {Style, jss} from './game.style'
-import {win, isGameEnded} from './robot'
+import {win, isGameEnded,makeDecision} from './robot'
 
 interface Props {turns: number[], users: string[], callback: any}
 interface State {}
@@ -11,21 +11,19 @@ export default class Game extends React.Component <Props, State>{
     private user1: HTMLDivElement
     private user2: HTMLDivElement
     private turnsOrder: boolean // if true user1 plays first
+    
     constructor(props: Props) {
-
         super(props)
         this.cells = new Array(9)
         this.turns = []
         this.playMode = false
-        // if(this.turns.length > 0 ) this.playMode = true
-        
-
-        // [this.user1,this.user2] =this.props.users
     }
 
     componentDidMount(){
         this.user1.classList.add(jss.underline)
         if(this.props.turns.length > 0) this.play()
+        else if(this.nameOfCurrentUser() == 'computer')
+            this.makeTurn(makeDecision(this.turns))
     }
     play(){
         // console.log('play')
@@ -43,20 +41,18 @@ export default class Game extends React.Component <Props, State>{
         // empty sector?
         if(this.turns.indexOf(sector) >=0) return
         // save turn
+
         this.turns.push(sector)
         // odd - tic, even - tac
-        
         const className = (this.turns.length%2) ? 'fa fa-times fa-3x' : 'fa fa-circle fa-3x'
         this.cells[sector].children.item(0).className = className
         // does somebody win ?
         if(win(this.turns)) {
             const user = (this.turns.length%2) ? 0 : 1
-            // console.log('the winner is '+  this.props.users[user])
             // save to log
-            
             if(!this.playMode) {
                 this.playMode = true
-                setTimeout(this.props.callback.bind(this,user + 1,this.turns),500)
+                setTimeout(this.props.callback.bind(this,user + 1,this.turns),300)
             }else{
                 setTimeout(this.props.callback.bind(this,0,this.turns),1500)
             }
@@ -65,6 +61,12 @@ export default class Game extends React.Component <Props, State>{
         if(isGameEnded(this.turns)) this.props.callback(0) // draw
         this.user1.classList.toggle(jss.underline)
         this.user2.classList.toggle(jss.underline)
+        if(this.nameOfCurrentUser() == 'computer'){
+            if(this.playMode) return
+            console.log('computer')
+            const decision = makeDecision(this.turns)
+            this.makeTurn(decision)
+        }
     }
     // user click handler
     turn(sector: number){
@@ -133,6 +135,9 @@ export default class Game extends React.Component <Props, State>{
                 </tr>
             </tbody>
         )
+    }
+    nameOfCurrentUser(){
+        return (this.turns.length%2) ? this.props.users[1] : this.props.users[0]
     }
 }
 
