@@ -36,16 +36,14 @@ class App extends React.Component<Props,State>{
 
 
     getResult(status: number, turns?: any){
-        console.log('get results')
+        
         switch(status){
             // draw
             case 0 :
                 // switch users
                 this.users  = [this.users[1], this.users[0]]
                 this.stage = 2
-                this.message = 'lets play again'
-                
-                // show 'draw' message for a while 
+                this.message = 'lets play again' 
                 this.forceUpdate()
                 break
             case 1 :

@@ -58,12 +58,11 @@ export default class Game extends React.Component <Props, State>{
             }
             return
         }
-        if(isGameEnded(this.turns)) this.props.callback(0) // draw
+        if(isGameEnded(this.turns)) return this.props.callback(0) // draw
         this.user1.classList.toggle(jss.underline)
         this.user2.classList.toggle(jss.underline)
         if(this.nameOfCurrentUser() == 'computer'){
             if(this.playMode) return
-            console.log('computer')
             const decision = makeDecision(this.turns)
             this.makeTurn(decision)
         }

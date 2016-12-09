@@ -73,7 +73,6 @@
 	        this.forceUpdate();
 	    };
 	    App.prototype.getResult = function (status, turns) {
-	        console.log('get results');
 	        switch (status) {
 	            // draw
 	            case 0:
@@ -81,7 +80,6 @@
 	                this.users = [this.users[1], this.users[0]];
 	                this.stage = 2;
 	                this.message = 'lets play again';
-	                // show 'draw' message for a while 
 	                this.forceUpdate();
 	                break;
 	            case 1:
@@ -189,7 +187,8 @@
 	                    return this.bingo();
 	                i2.disabled = false;
 	                // maybe user1 wants to play with computer?
-	                i2.value = 'computer';
+	                if (i1.value != 'computer')
+	                    i2.value = 'computer';
 	                // maybe not
 	                i2.setSelectionRange(0, 100);
 	                i2.focus();
@@ -995,13 +994,12 @@
 	            return;
 	        }
 	        if (robot_1.isGameEnded(this.turns))
-	            this.props.callback(0); // draw
+	            return this.props.callback(0); // draw
 	        this.user1.classList.toggle(game_style_1.jss.underline);
 	        this.user2.classList.toggle(game_style_1.jss.underline);
 	        if (this.nameOfCurrentUser() == 'computer') {
 	            if (this.playMode)
 	                return;
-	            console.log('computer');
 	            var decision = robot_1.makeDecision(this.turns);
 	            this.makeTurn(decision);
 	        }
@@ -1158,10 +1156,13 @@
 	"use strict";
 	function makeDecision(turns) {
 	    var turn = turns.length;
+	    var iWin = couldIwin(turns);
+	    if (iWin != -1)
+	        return iWin;
 	    // check user turns for danger situation
-	    var danger = isDanger(turns);
-	    if (danger != -1)
-	        return danger;
+	    var notNow = isItDanger(turns);
+	    if (notNow != -1)
+	        return notNow;
 	    switch (turn) {
 	        case 2:
 	            // is opponent has a side
@@ -1180,6 +1181,11 @@
 	    return getFreeCell(turns);
 	}
 	exports.makeDecision = makeDecision;
+	function couldIwin(turns) {
+	    var myTurns = turns.filter(function (val) { return true; });
+	    myTurns.push(12);
+	    return isItDanger(myTurns);
+	}
 	// important loose prevention turn
 	function three(turns) {
 	    var cases = [
@@ -1204,7 +1210,7 @@
 	            }
 	    return -1;
 	}
-	function isDanger(turns) {
+	function isItDanger(turns) {
 	    var cases = [
 	        [0, 1], [2, 5], [7, 8], [6, 3], [0, 3], [6, 7], [5, 8], [1, 2],
 	        [0, 2], [2, 8], [6, 8], [0, 6], [1, 4], [4, 5], [4, 7], [3, 4],
@@ -1231,7 +1237,7 @@
 	    return -1;
 	}
 	function lastUserTurns(turns) {
-	    return turns.filter(function (val, idx) { return (turns.length % 2 + idx % 2 == 1); }).sort();
+	    return turns.filter(function (val, idx) { return (turns.length % 2 + idx % 2 == 1); }).sort(function (a, b) { return a - b; });
 	}
 	// returns true if player, who has made last turn wins
 	function win(turns) {
@@ -1249,7 +1255,6 @@
 	}
 	exports.win = win;
 	function isGameEnded(turns) {
-	    console.log('ended?' + turns.length);
 	    if (turns.length == 9)
 	        return true;
 	    return false;

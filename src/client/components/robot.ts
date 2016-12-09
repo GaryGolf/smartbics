@@ -1,9 +1,13 @@
 export function makeDecision(turns: number[]): number {
     
     const turn = turns.length
+    
+    const iWin = couldIwin(turns)
+    if(iWin != -1) return iWin
+    
     // check user turns for danger situation
-    const danger = isDanger(turns)
-    if(danger != -1) return danger
+    const notNow = isItDanger(turns)
+    if(notNow != -1) return notNow
 
     switch(turn){
         case 2 :
@@ -19,6 +23,13 @@ export function makeDecision(turns: number[]): number {
             break
     }
     return getFreeCell(turns)
+}
+
+function couldIwin(turns: number[]): number {
+
+    let myTurns:number[] = turns.filter(val => true)
+    myTurns.push(12)
+    return isItDanger(myTurns)
 }
 // important loose prevention turn
 function three(turns: number[]): number {
@@ -45,7 +56,7 @@ function three(turns: number[]): number {
     return -1
 }
 
-function isDanger(turns: number[]): number{
+function isItDanger(turns: number[]): number{
     
     const cases: number[][] = [
      [0,1],[2,5],[7,8],[6,3],[0,3],[6,7],[5,8],[1,2],
@@ -71,7 +82,7 @@ function isDanger(turns: number[]): number{
     return -1
 }
 function lastUserTurns(turns: number[]): number[] {
-    return turns.filter((val, idx) => (turns.length % 2 + idx % 2 == 1)).sort()
+    return turns.filter((val, idx) => (turns.length % 2 + idx % 2 == 1)).sort((a,b) => a-b)
 } 
 
 // returns true if player, who has made last turn wins
@@ -89,7 +100,6 @@ export function win(turns: number[]):boolean {
     return inspectAllCases(cases,createArrayOfTripples(fturns))
 }
 export function isGameEnded(turns: number[]):boolean {
-    console.log('ended?'+turns.length)
     if(turns.length == 9) return true
     return false
 }

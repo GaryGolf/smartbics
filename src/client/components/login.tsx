@@ -30,7 +30,7 @@ export default class Login extends React.Component <Props, State>{
                 if(i2.value != '' && i1.value != i2.value ) return this.bingo()
                 i2.disabled = false
                 // maybe user1 wants to play with computer?
-                i2.value = 'computer'
+                if(i1.value != 'computer') i2.value = 'computer'
                 // maybe not
                 i2.setSelectionRange(0,100)
                 i2.focus()
