@@ -107,46 +107,6 @@
 	        }
 	        this.forceUpdate();
 	    };
-	    // getResult(status: number, turns?: any){
-	    //     switch(status){
-	    //         // draw
-	    //         case 0 :
-	    //             // switch users
-	    //             this.users  = [this.users[1], this.users[0]]
-	    //             this.stage = 2
-	    //             this.message = 'lets play again' 
-	    //             this.forceUpdate()
-	    //             break
-	    //         case 1 :
-	    //         case 2 :
-	    //             // someone wins
-	    //             const winner = this.users[status-1]
-	    //             const looser = (status-1 == 0) ? this.users[1] : this.users[0]
-	    //             this.message = winner + ' wins!'
-	    //             // save stats
-	    //             updateRecords(winner, looser)
-	    //             writeToLog({name: winner,date: Date.now(),users: this.users,turns})
-	    //             this.stage = 2
-	    //             this.forceUpdate() 
-	    //             break
-	    //         case 3 : // play again
-	    //             this.users  = [this.users[1], this.users[0]]
-	    //             this.stage = 1
-	    //             this.forceUpdate()
-	    //             break
-	    //         case 4 :  // replay old game
-	    //             this.players = turns.users
-	    //             this.turns = turns.turns
-	    //             this.stage = 3
-	    //             this.forceUpdate()
-	    //             break
-	    //         case 5 : // new game
-	    //             this.stage = 0
-	    //             this.forceUpdate()
-	    //             break;
-	    //         default :
-	    //     }
-	    // }
 	    App.prototype.render = function () {
 	        var dispatch = {
 	            onDispatch: this.dispatch.bind(this)
@@ -1017,20 +977,14 @@
 	        // does somebody win ?
 	        if (robot_1.win(this.turns)) {
 	            // save to log
-	            if (!this.playMode) {
-	                var payload = {
-	                    turns: this.turns,
-	                    users: this.props.users,
-	                    winner: (this.turns, length % 2) ? this.props.users[1] : this.props.users[0],
-	                    looser: (this.turns, length % 2) ? this.props.users[0] : this.props.users[1],
-	                };
-	                setTimeout(this.props.onDispatch.bind(this, 'CONGRAT_WINNER', payload), 300);
-	            }
-	            else {
-	                // setTimeout(this.props.callback.bind(this,0,this.turns),1500)
-	                setTimeout(this.props.onDispatch.bind(this, 'SHOW_LEADERBAORD'), 1500);
-	            }
-	            return;
+	            if (this.playMode)
+	                return setTimeout(this.props.onDispatch.bind(this, 'SHOW_LEADERBAORD'), 1500);
+	            return setTimeout(this.props.onDispatch.bind(this, 'CONGRAT_WINNER', {
+	                turns: this.turns,
+	                users: this.props.users,
+	                winner: (this.turns.length % 2) ? this.props.users[0] : this.props.users[1],
+	                looser: (this.turns.length % 2) ? this.props.users[1] : this.props.users[0],
+	            }), 300);
 	        }
 	        if (robot_1.isGameEnded(this.turns))
 	            return this.props.onDispatch('SHOW_LEADERBAORD'); // draw

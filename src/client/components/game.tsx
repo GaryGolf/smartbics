@@ -46,7 +46,6 @@ export default class Game extends React.Component <Props, State>{
         // empty sector?
         if(this.turns.indexOf(sector) >=0) return
         // save turn
-
         this.turns.push(sector)
         // odd - tic, even - tac
         const className = (this.turns.length%2) ? 'fa fa-times fa-3x' : 'fa fa-circle fa-3x'
@@ -54,20 +53,14 @@ export default class Game extends React.Component <Props, State>{
         // does somebody win ?
         if(win(this.turns)) {
             // save to log
-            if(!this.playMode) {
-                
-                const payload = {
-                    turns:  this.turns,
-                    users:  this.props.users,
-                    winner: (this.turns,length%2) ? this.props.users[1] : this.props.users[0],
-                    looser: (this.turns,length%2) ? this.props.users[0] : this.props.users[1],
-                }
-                setTimeout(this.props.onDispatch.bind(this,'CONGRAT_WINNER', payload),300)
-            }else{
-                // setTimeout(this.props.callback.bind(this,0,this.turns),1500)
-                setTimeout(this.props.onDispatch.bind(this,'SHOW_LEADERBAORD'),1500)
-            }
-            return
+            if(this.playMode) return setTimeout(this.props.onDispatch.bind(this,'SHOW_LEADERBAORD'),1500)
+
+             return setTimeout(this.props.onDispatch.bind(this,'CONGRAT_WINNER',{
+                turns:  this.turns,
+                users:  this.props.users,
+                winner: (this.turns.length%2) ? this.props.users[0] : this.props.users[1],
+                looser: (this.turns.length%2) ? this.props.users[1] : this.props.users[0],
+            }),300)
         }
         if(isGameEnded(this.turns)) return this.props.onDispatch('SHOW_LEADERBAORD') // draw
         this.user1.classList.toggle(jss.underline)
@@ -149,7 +142,7 @@ export default class Game extends React.Component <Props, State>{
             </tbody>
         )
     }
-    
+
     nameOfCurrentUser(){
         return (this.turns.length%2) ? this.props.users[1] : this.props.users[0]
     }

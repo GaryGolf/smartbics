@@ -63,48 +63,6 @@ class App extends React.Component<Props,State>{
         this.forceUpdate()
     }   
   
-    // getResult(status: number, turns?: any){
-        
-    //     switch(status){
-    //         // draw
-    //         case 0 :
-    //             // switch users
-    //             this.users  = [this.users[1], this.users[0]]
-    //             this.stage = 2
-    //             this.message = 'lets play again' 
-    //             this.forceUpdate()
-    //             break
-    //         case 1 :
-    //         case 2 :
-    //             // someone wins
-    //             const winner = this.users[status-1]
-    //             const looser = (status-1 == 0) ? this.users[1] : this.users[0]
-    //             this.message = winner + ' wins!'
-    //             // save stats
-    //             updateRecords(winner, looser)
-    //             writeToLog({name: winner,date: Date.now(),users: this.users,turns})
-    //             this.stage = 2
-    //             this.forceUpdate() 
-    //             break
-    //         case 3 : // play again
-    //             this.users  = [this.users[1], this.users[0]]
-    //             this.stage = 1
-    //             this.forceUpdate()
-    //             break
-    //         case 4 :  // replay old game
-    //             this.players = turns.users
-    //             this.turns = turns.turns
-    //             this.stage = 3
-    //             this.forceUpdate()
-    //             break
-    //         case 5 : // new game
-    //             this.stage = 0
-    //             this.forceUpdate()
-    //             break;
-    //         default :
-    //     }
-    // }
-
     render(){
 
         const dispatch = {
