@@ -1,12 +1,10 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-
+import * as c from './components/constants'
 import Login from './components/login'
 import Game from './components/game'
 import Leaderboard from './components/leaderboard'
 import {getNames, updateRecords,getLeaderboardRecords, writeToLog} from './components/localstore'
-
-
 
 interface Props {}
 interface State {}
@@ -31,29 +29,28 @@ class App extends React.Component<Props,State>{
     dispatch(action: string, payload: any){
 
         switch(action){
-            case 'GET_USERS' :
+            case c.GET_USERS :
                 this.stage = 1
                 this.users = payload.users
                 break
-            case 'SHOW_LEADERBAORD' :
+            case c.SHOW_LEADERBAORD :
                 this.stage = 2
-                // this.users  = [this.users[1], this.users[0]]
                 this.message = 'lets play again'
                 break
-            case 'START_GAME' :
+            case c.START_GAME :
                 this.stage = 1
                 this.users  = [this.users[1], this.users[0]]
                 break
-            case 'NEW_GAME' :
+            case c.NEW_GAME :
                 this.stage = 0
                 break
-            case 'CONGRAT_WINNER' :
+            case c.CONGRAT_WINNER :
                 this.stage = 2
                 this.message = payload.winner+' wins!'
                 updateRecords(payload.winner, payload.looser)
                 writeToLog({name: payload.winner,date: Date.now(),users: this.users,turns: payload.turns})
                 break
-            case 'REPLAY_GAME' :
+            case c.REPLAY_GAME :
                 this.stage = 3
                 this.players = payload.users
                 this.turns = payload.turns

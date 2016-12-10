@@ -1,7 +1,7 @@
 import * as React from 'react'
+import * as c from './constants'
 import {Style, jss} from './game.style'
 import {win, isGameEnded,makeDecision} from './robot'
-
 
 interface Props {turns: number[], users: string[], onDispatch: any}
 interface State {}
@@ -53,16 +53,16 @@ export default class Game extends React.Component <Props, State>{
         // does somebody win ?
         if(win(this.turns)) {
             // save to log
-            if(this.playMode) return setTimeout(this.props.onDispatch.bind(this,'SHOW_LEADERBAORD'),1500)
+            if(this.playMode) return setTimeout(this.props.onDispatch.bind(this,c.SHOW_LEADERBAORD),1500)
 
-             return setTimeout(this.props.onDispatch.bind(this,'CONGRAT_WINNER',{
+             return setTimeout(this.props.onDispatch.bind(this,c.CONGRAT_WINNER,{
                 turns:  this.turns,
                 users:  this.props.users,
                 winner: (this.turns.length%2) ? this.props.users[0] : this.props.users[1],
                 looser: (this.turns.length%2) ? this.props.users[1] : this.props.users[0],
             }),300)
         }
-        if(isGameEnded(this.turns)) return this.props.onDispatch('SHOW_LEADERBAORD') // draw
+        if(isGameEnded(this.turns)) return this.props.onDispatch(c.SHOW_LEADERBAORD) // draw
         this.user1.classList.toggle(jss.underline)
         this.user2.classList.toggle(jss.underline)
         if(this.nameOfCurrentUser() == 'computer'){

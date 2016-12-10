@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as c from './constants'
 import {LeaderboardRecord, getLeaderboardRecords, getLogDataByName , LeaderboardLog} from './localstore'
 import {Style, jss} from './leaderboard.style'
 
@@ -26,7 +27,7 @@ export default class Leaderboard extends React.Component<Props,State>{
         this.forceUpdate()
     }
     play(record: LeaderboardLog){
-        this.props.onDispatch('REPLAY_GAME',record)
+        this.props.onDispatch(c.REPLAY_GAME, record)
     }
 
     render(){
@@ -38,8 +39,8 @@ export default class Leaderboard extends React.Component<Props,State>{
                    { (this.log) ? this.drawLog(this.message) : this.leaderboard()}
                 </div>
                 <div>
-                <button className={jss.button} onClick={this.props.onDispatch.bind(this,'NEW_GAME')}>New Game</button>
-                <button className={jss.button} onClick={this.props.onDispatch.bind(this,'START_GAME')}>Continue</button>
+                <button className={jss.button} onClick={this.props.onDispatch.bind(this,c.NEW_GAME)}>New Game</button>
+                <button className={jss.button} onClick={this.props.onDispatch.bind(this,c.START_GAME)}>Continue</button>
                 </div>
                 <style>{Style.getStyles()}</style>
             </div>

@@ -60,6 +60,7 @@
 	};
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(2);
+	var c = __webpack_require__(13);
 	var login_1 = __webpack_require__(3);
 	var game_1 = __webpack_require__(7);
 	var leaderboard_1 = __webpack_require__(10);
@@ -76,29 +77,28 @@
 	    };
 	    App.prototype.dispatch = function (action, payload) {
 	        switch (action) {
-	            case 'GET_USERS':
+	            case c.GET_USERS:
 	                this.stage = 1;
 	                this.users = payload.users;
 	                break;
-	            case 'SHOW_LEADERBAORD':
+	            case c.SHOW_LEADERBAORD:
 	                this.stage = 2;
-	                // this.users  = [this.users[1], this.users[0]]
 	                this.message = 'lets play again';
 	                break;
-	            case 'START_GAME':
+	            case c.START_GAME:
 	                this.stage = 1;
 	                this.users = [this.users[1], this.users[0]];
 	                break;
-	            case 'NEW_GAME':
+	            case c.NEW_GAME:
 	                this.stage = 0;
 	                break;
-	            case 'CONGRAT_WINNER':
+	            case c.CONGRAT_WINNER:
 	                this.stage = 2;
 	                this.message = payload.winner + ' wins!';
 	                localstore_1.updateRecords(payload.winner, payload.looser);
 	                localstore_1.writeToLog({ name: payload.winner, date: Date.now(), users: this.users, turns: payload.turns });
 	                break;
-	            case 'REPLAY_GAME':
+	            case c.REPLAY_GAME:
 	                this.stage = 3;
 	                this.players = payload.users;
 	                this.turns = payload.turns;
@@ -935,6 +935,7 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var React = __webpack_require__(1);
+	var c = __webpack_require__(13);
 	var game_style_1 = __webpack_require__(8);
 	var robot_1 = __webpack_require__(9);
 	var Game = (function (_super) {
@@ -978,8 +979,8 @@
 	        if (robot_1.win(this.turns)) {
 	            // save to log
 	            if (this.playMode)
-	                return setTimeout(this.props.onDispatch.bind(this, 'SHOW_LEADERBAORD'), 1500);
-	            return setTimeout(this.props.onDispatch.bind(this, 'CONGRAT_WINNER', {
+	                return setTimeout(this.props.onDispatch.bind(this, c.SHOW_LEADERBAORD), 1500);
+	            return setTimeout(this.props.onDispatch.bind(this, c.CONGRAT_WINNER, {
 	                turns: this.turns,
 	                users: this.props.users,
 	                winner: (this.turns.length % 2) ? this.props.users[0] : this.props.users[1],
@@ -987,7 +988,7 @@
 	            }), 300);
 	        }
 	        if (robot_1.isGameEnded(this.turns))
-	            return this.props.onDispatch('SHOW_LEADERBAORD'); // draw
+	            return this.props.onDispatch(c.SHOW_LEADERBAORD); // draw
 	        this.user1.classList.toggle(game_style_1.jss.underline);
 	        this.user2.classList.toggle(game_style_1.jss.underline);
 	        if (this.nameOfCurrentUser() == 'computer') {
@@ -1313,6 +1314,7 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var React = __webpack_require__(1);
+	var c = __webpack_require__(13);
 	var localstore_1 = __webpack_require__(11);
 	var leaderboard_style_1 = __webpack_require__(12);
 	var Leaderboard = (function (_super) {
@@ -1330,15 +1332,15 @@
 	        this.forceUpdate();
 	    };
 	    Leaderboard.prototype.play = function (record) {
-	        this.props.onDispatch('REPLAY_GAME', record);
+	        this.props.onDispatch(c.REPLAY_GAME, record);
 	    };
 	    Leaderboard.prototype.render = function () {
 	        return (React.createElement("div", {className: leaderboard_style_1.jss.container}, 
 	            React.createElement("h1", null, this.message), 
 	            React.createElement("div", {className: leaderboard_style_1.jss.leaderboard}, (this.log) ? this.drawLog(this.message) : this.leaderboard()), 
 	            React.createElement("div", null, 
-	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, 'NEW_GAME')}, "New Game"), 
-	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, 'START_GAME')}, "Continue")), 
+	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, c.NEW_GAME)}, "New Game"), 
+	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, c.START_GAME)}, "Continue")), 
 	            React.createElement("style", null, leaderboard_style_1.Style.getStyles())));
 	    };
 	    Leaderboard.prototype.leaderboard = function () {
@@ -1506,6 +1508,19 @@
 	        textShadow: '1px 1px 2px rgba(24,56,100,.7)'
 	    })
 	};
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	"use strict";
+	exports.GET_USERS = 'GET_USERS';
+	exports.SHOW_LEADERBAORD = 'SHOW_LEADERBAORD';
+	exports.START_GAME = 'START_GAME';
+	exports.NEW_GAME = 'NEW_GAME';
+	exports.CONGRAT_WINNER = 'CONGRAT_WINNER';
+	exports.REPLAY_GAME = 'REPLAY_GAME';
 
 
 /***/ }
