@@ -12,7 +12,7 @@ export const jss = {
         border: '2px solid gray',
         borderRadius: '6px',
         boxSizing: 'border-box',
-        float: 'none',
+        // float: 'none',
         transitionDuration: '0.5s',
         margin: '7px',
         width: '250px',
@@ -24,14 +24,11 @@ export const jss = {
     }),
     login: Style.registerStyle({
        
-        // position: 'relative',
-        // display: 'table-cell',
-        // verticalAlign: 'middle',
         margin: 'auto',
-        marginTop: '10%',
+        marginTop: '20%',
         border: '2px dashed #677380',
-        padding: '0px 20px 20px 20px',
-        width: '310px'
+        // padding: '0px 20px 20px 20px',
+        width: '300px'
          
     }),
     title: Style.registerStyle({
@@ -45,4 +42,12 @@ export const jss = {
             textShadow: '2px 2px 4px #222328'
         } 
     }),
+      button: Style.registerStyle({
+  
+       width: '100px',
+       color: 'gray',
+       margin: '7px',
+       marginBottom: '16px',
+       textShadow: '1px 1px 2px rgba(24,56,100,.7)'
+    })
 }

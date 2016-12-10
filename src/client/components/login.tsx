@@ -1,13 +1,16 @@
 import * as React from 'react'
+import * as c from './constants'
 import {Style, jss} from './login.style'
-
 
 interface Props {users: string[], onDispatch: any}
 interface State {}
+
 export default class Login extends React.Component <Props, State>{
 
     private input1: HTMLInputElement
     private input2: HTMLInputElement
+    private button: HTMLButtonElement
+
     constructor(props: Props) {
 
         super(props)
@@ -72,8 +75,11 @@ export default class Login extends React.Component <Props, State>{
     }
 
     loadGame(){
-        const users = {users:[this.input1.value, this.input2.value]}
-        this.props.onDispatch('GET_USERS',users)
+        const i1 = this.input1.value
+        const i2 = this.input2.value
+        if(i1 == '' || i2 == '' || i1 == i2) return
+        const users = {users:[i1, i2]}
+        this.props.onDispatch(c.GET_USERS, users)
     }
 
     render() {
@@ -82,13 +88,19 @@ export default class Login extends React.Component <Props, State>{
         return (
 
             <div className={jss.login}>
+                
+                
                 <h3 className={jss.title}>крестики - нолики</h3>
                 <input ref={el => this.input1 = el} className={jss.input} 
                 type="text" placeholder="User 1" {...in1}/>
                 <input ref={el => this.input2 = el} className={jss.input} 
                 type="text" placeholder="User 2" {...in2} />
-                
+                <div>
+                    <button ref={el => this.button = el} className={jss.button}
+                    onClick={this.loadGame.bind(this)}>Start</button>
+                </div>
                 <style>{Style.getStyles()}</style>
+                
             </div>)
     }
 }

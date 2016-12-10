@@ -35,6 +35,4 @@ export const jss = {
        color: 'gray',
        textShadow: '1px 1px 2px rgba(24,56,100,.7)'
     })
-
-
 }

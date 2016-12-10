@@ -160,6 +160,7 @@
 	    return t;
 	};
 	var React = __webpack_require__(1);
+	var c = __webpack_require__(13);
 	var login_style_1 = __webpack_require__(4);
 	var Login = (function (_super) {
 	    __extends(Login, _super);
@@ -223,8 +224,12 @@
 	            }
 	    };
 	    Login.prototype.loadGame = function () {
-	        var users = { users: [this.input1.value, this.input2.value] };
-	        this.props.onDispatch('GET_USERS', users);
+	        var i1 = this.input1.value;
+	        var i2 = this.input2.value;
+	        if (i1 == '' || i2 == '' || i1 == i2)
+	            return;
+	        var users = { users: [i1, i2] };
+	        this.props.onDispatch(c.GET_USERS, users);
 	    };
 	    Login.prototype.render = function () {
 	        var _this = this;
@@ -234,6 +239,9 @@
 	            React.createElement("h3", {className: login_style_1.jss.title}, "крестики - нолики"), 
 	            React.createElement("input", __assign({ref: function (el) { return _this.input1 = el; }, className: login_style_1.jss.input, type: "text", placeholder: "User 1"}, in1)), 
 	            React.createElement("input", __assign({ref: function (el) { return _this.input2 = el; }, className: login_style_1.jss.input, type: "text", placeholder: "User 2"}, in2)), 
+	            React.createElement("div", null, 
+	                React.createElement("button", {ref: function (el) { return _this.button = el; }, className: login_style_1.jss.button, onClick: this.loadGame.bind(this)}, "Start")
+	            ), 
 	            React.createElement("style", null, login_style_1.Style.getStyles())));
 	    };
 	    return Login;
@@ -255,7 +263,7 @@
 	        border: '2px solid gray',
 	        borderRadius: '6px',
 	        boxSizing: 'border-box',
-	        float: 'none',
+	        // float: 'none',
 	        transitionDuration: '0.5s',
 	        margin: '7px',
 	        width: '250px',
@@ -266,14 +274,11 @@
 	        }
 	    }),
 	    login: exports.Style.registerStyle({
-	        // position: 'relative',
-	        // display: 'table-cell',
-	        // verticalAlign: 'middle',
 	        margin: 'auto',
-	        marginTop: '10%',
+	        marginTop: '20%',
 	        border: '2px dashed #677380',
-	        padding: '0px 20px 20px 20px',
-	        width: '310px'
+	        // padding: '0px 20px 20px 20px',
+	        width: '300px'
 	    }),
 	    title: exports.Style.registerStyle({
 	        color: '#A7A3AA',
@@ -286,6 +291,13 @@
 	            textShadow: '2px 2px 4px #222328'
 	        }
 	    }),
+	    button: exports.Style.registerStyle({
+	        width: '100px',
+	        color: 'gray',
+	        margin: '7px',
+	        marginBottom: '16px',
+	        textShadow: '1px 1px 2px rgba(24,56,100,.7)'
+	    })
 	};
 
 
