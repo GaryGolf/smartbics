@@ -1146,21 +1146,23 @@
 	"use strict";
 	var FreeStyle = __webpack_require__(6);
 	exports.Style = FreeStyle.create();
-	var width = Math.min(340, window.screen.width - 20, window.screen.height - 30);
+	var width = Math.min(340, window.screen.width - 80, window.screen.height - 100);
+	var transformAnimation = exports.Style.registerKeyframes({
+	    from: { transform: 'translate(' + window.screen.width + 'px)' }
+	});
 	exports.jss = {
 	    container: exports.Style.registerStyle({
-	        position: 'absolute',
 	        top: '0px',
-	        left: '10px',
 	        width: '100%',
 	        height: '100%',
-	        display: 'table-cell',
-	        textAlign: 'center'
+	        textAlign: 'center',
+	        animationName: transformAnimation,
+	        animationDuration: '.5s'
 	    }),
 	    game: exports.Style.registerStyle({
-	        // position: 'relative',
 	        margin: 'auto',
-	        width: '360px',
+	        width: (width + 4) + 'px',
+	        marginTop: '5%'
 	    }),
 	    cell: exports.Style.registerStyle({
 	        display: 'table-cell',
