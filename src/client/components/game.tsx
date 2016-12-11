@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as c from './constants'
+import {SHOW_LEADERBAORD, CONGRAT_WINNER,NEW_GAME} from './constants'
 import {Style, jss} from './game.style'
 import {win, isGameEnded,makeDecision} from './robot'
 
@@ -13,6 +13,7 @@ export default class Game extends React.Component <Props, State>{
     private playMode: boolean
     private user1: HTMLDivElement
     private user2: HTMLDivElement
+    private swipeStart: number
     
     
     constructor(props: Props) {
@@ -22,6 +23,15 @@ export default class Game extends React.Component <Props, State>{
         this.playMode = false
     }
 
+    componentWillMount(){
+        window.addEventListener('resize', (event: Event) => {
+            console.log('resize '+ window.screen.width)
+            // this.forceUpdate()
+        })
+    }
+    componentWillUnmount() {
+
+    }
     componentDidMount(){
         this.user1.classList.add(jss.underline)
         if(this.props.turns.length > 0) this.play()
@@ -53,16 +63,16 @@ export default class Game extends React.Component <Props, State>{
         // does somebody win ?
         if(win(this.turns)) {
             // save to log
-            if(this.playMode) return setTimeout(this.props.onDispatch.bind(this,c.SHOW_LEADERBAORD),1500)
+            if(this.playMode) return setTimeout(this.props.onDispatch.bind(this, SHOW_LEADERBAORD),1500)
 
-             return setTimeout(this.props.onDispatch.bind(this,c.CONGRAT_WINNER,{
+             return setTimeout(this.props.onDispatch.bind(this, CONGRAT_WINNER,{
                 turns:  this.turns,
                 users:  this.props.users,
                 winner: (this.turns.length%2) ? this.props.users[0] : this.props.users[1],
                 looser: (this.turns.length%2) ? this.props.users[1] : this.props.users[0],
             }),300)
         }
-        if(isGameEnded(this.turns)) return this.props.onDispatch(c.SHOW_LEADERBAORD) // draw
+        if(isGameEnded(this.turns)) return this.props.onDispatch(SHOW_LEADERBAORD) // draw
         this.user1.classList.toggle(jss.underline)
         this.user2.classList.toggle(jss.underline)
         if(this.nameOfCurrentUser() == 'computer'){
@@ -78,14 +88,43 @@ export default class Game extends React.Component <Props, State>{
         this.makeTurn(sector)
     }
 
+    swipeHandler(event: TouchEvent) {
+
+        if(!event.touches ||  !event.touches.length) return
+
+        const dx = event.touches.item(0).pageX - this.swipeStart
+        
+    
+        if(dx >= 50) {
+            event.target.removeEventListener('touchmove',this.swipeHandler.bind(this))
+            this.props.onDispatch(NEW_GAME)
+        }
+        if(dx <= -50) {
+            event.target.removeEventListener('touchmove',this.swipeHandler.bind(this))
+            this.props.onDispatch( SHOW_LEADERBAORD)
+        }
+        
+    }
+
+    touchHandler(event: TouchEvent) {
+        if(!event.touches ||  !event.touches.length) return
+        this.swipeStart = event.touches.item(0).pageX
+        console.log('start at '+ this.swipeStart)
+        event.target.addEventListener('touchmove',this.swipeHandler.bind(this))
+    }
+
+
     render(){
+        const touch = {
+            onTouchStart: this.touchHandler.bind(this)
+        }
         return (
-            <div className={jss.container}>
-            <div className={jss.game}>
-                <table>{this.drawBoard()}</table>
-                <table>{this.drawUsers()}</table>
-                <style>{Style.getStyles()}</style>
-            </div>
+            <div className={jss.container} {...touch}>
+                <div className={jss.game}>
+                    <table>{this.drawBoard()}</table>
+                    <table>{this.drawUsers()}</table>
+                    <style>{Style.getStyles()}</style>
+                </div>
             </div>
         )
     }

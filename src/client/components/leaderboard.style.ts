@@ -1,5 +1,6 @@
 import * as FreeStyle from 'free-style'
 
+const tabHeight = Math.min(480,window.screen.height/2)
 
 export const Style = FreeStyle.create()
 
@@ -8,15 +9,17 @@ export const jss = {
 
     container: Style.registerStyle({
         
-        color: 'silver'
+        color: 'silver',
+        width: '100%',
+        height: '100%'
         
     }),
 
     leaderboard: Style.registerStyle({
         margin: ' 30px auto',
-        height: '400px',
+        height: tabHeight,
         overflow: 'auto',
-        width: '320px',
+        width: '300px',
         background: 'rgba(100,100,100,.05)'
     }),
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as c from './constants'
+import {NEW_GAME, START_GAME, REPLAY_GAME} from './constants'
 import {LeaderboardRecord, getLeaderboardRecords, getLogDataByName , LeaderboardLog} from './localstore'
 import {Style, jss} from './leaderboard.style'
 
@@ -12,7 +12,7 @@ export default class Leaderboard extends React.Component<Props,State>{
    private table: JSX.Element
    private message: string
    private log: boolean
-   //private name: string
+   private swipeStart: number
 
     constructor(props: Props){
         super(props)
@@ -27,20 +27,49 @@ export default class Leaderboard extends React.Component<Props,State>{
         this.forceUpdate()
     }
     play(record: LeaderboardLog){
-        this.props.onDispatch(c.REPLAY_GAME, record)
+        this.props.onDispatch(REPLAY_GAME, record)
     }
 
+    swipeHandler(event: TouchEvent) {
+
+        if(!event.touches ||  !event.touches.length) return
+
+        const dx = event.touches.item(0).pageX - this.swipeStart
+        
+    
+        if(dx >= 50) {
+            event.target.removeEventListener('touchmove',this.swipeHandler.bind(this))
+            this.props.onDispatch(START_GAME)
+        }
+        if(dx <= -50) {
+            event.target.removeEventListener('touchmove',this.swipeHandler.bind(this))
+            this.props.onDispatch(NEW_GAME)
+        }
+        
+    }
+
+    touchHandler(event: TouchEvent) {
+        if(!event.touches ||  !event.touches.length) return
+        this.swipeStart = event.touches.item(0).pageX
+        console.log('start at '+ this.swipeStart)
+        event.target.addEventListener('touchmove',this.swipeHandler.bind(this))
+    }
+
+        
     render(){
+        const touch = {
+            onTouchStart: this.touchHandler.bind(this)
+        }
         return (
-            <div className={jss.container}>
+            <div className={jss.container} {...touch}>
                 <h1>{this.message}</h1>
 
                 <div className={jss.leaderboard}>
                    { (this.log) ? this.drawLog(this.message) : this.leaderboard()}
                 </div>
                 <div>
-                <button className={jss.button} onClick={this.props.onDispatch.bind(this,c.NEW_GAME)}>New Game</button>
-                <button className={jss.button} onClick={this.props.onDispatch.bind(this,c.START_GAME)}>Continue</button>
+                <button className={jss.button} onClick={this.props.onDispatch.bind(this,NEW_GAME)}>New Game</button>
+                <button className={jss.button} onClick={this.props.onDispatch.bind(this,START_GAME)}>Continue</button>
                 </div>
                 <style>{Style.getStyles()}</style>
             </div>

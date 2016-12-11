@@ -12,7 +12,6 @@ export const jss = {
         border: '2px solid gray',
         borderRadius: '6px',
         boxSizing: 'border-box',
-        // float: 'none',
         transitionDuration: '0.5s',
         margin: '7px',
         width: '250px',
@@ -25,7 +24,7 @@ export const jss = {
     login: Style.registerStyle({
        
         margin: 'auto',
-        marginTop: '20%',
+        marginTop: '10%',
         border: '2px dashed #677380',
         // padding: '0px 20px 20px 20px',
         width: '300px'

@@ -60,45 +60,46 @@
 	};
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(2);
-	var c = __webpack_require__(13);
 	var login_1 = __webpack_require__(3);
-	var game_1 = __webpack_require__(7);
-	var leaderboard_1 = __webpack_require__(10);
-	var localstore_1 = __webpack_require__(11);
+	var game_1 = __webpack_require__(8);
+	var leaderboard_1 = __webpack_require__(11);
+	var localstore_1 = __webpack_require__(12);
+	var constants_1 = __webpack_require__(4);
 	var App = (function (_super) {
 	    __extends(App, _super);
 	    function App(props) {
-	        _super.call(this, props);
-	        this.message = 'hello';
-	        this.stage = 0;
+	        var _this = _super.call(this, props) || this;
+	        _this.message = 'hello';
+	        _this.stage = 0;
+	        return _this;
 	    }
 	    App.prototype.componentWillMount = function () {
 	        // localStorage.clear()
 	    };
 	    App.prototype.dispatch = function (action, payload) {
 	        switch (action) {
-	            case c.GET_USERS:
+	            case constants_1.GET_USERS:
 	                this.stage = 1;
 	                this.users = payload.users;
 	                break;
-	            case c.SHOW_LEADERBAORD:
+	            case constants_1.SHOW_LEADERBAORD:
 	                this.stage = 2;
 	                this.message = 'lets play again';
 	                break;
-	            case c.START_GAME:
+	            case constants_1.START_GAME:
 	                this.stage = 1;
 	                this.users = [this.users[1], this.users[0]];
 	                break;
-	            case c.NEW_GAME:
+	            case constants_1.NEW_GAME:
 	                this.stage = 0;
 	                break;
-	            case c.CONGRAT_WINNER:
+	            case constants_1.CONGRAT_WINNER:
 	                this.stage = 2;
 	                this.message = payload.winner + ' wins!';
 	                localstore_1.updateRecords(payload.winner, payload.looser);
 	                localstore_1.writeToLog({ name: payload.winner, date: Date.now(), users: this.users, turns: payload.turns });
 	                break;
-	            case c.REPLAY_GAME:
+	            case constants_1.REPLAY_GAME:
 	                this.stage = 3;
 	                this.players = payload.users;
 	                this.turns = payload.turns;
@@ -113,13 +114,13 @@
 	        };
 	        switch (this.stage) {
 	            case 0:
-	                return React.createElement(login_1.default, __assign({users: localstore_1.getNames()}, dispatch));
+	                return React.createElement(login_1.default, __assign({ users: localstore_1.getNames() }, dispatch));
 	            case 1:
-	                return React.createElement(game_1.default, __assign({turns: [], users: this.users}, dispatch));
+	                return React.createElement(game_1.default, __assign({ turns: [], users: this.users }, dispatch));
 	            case 2:
-	                return React.createElement(leaderboard_1.default, __assign({message: this.message}, dispatch));
+	                return React.createElement(leaderboard_1.default, __assign({ message: this.message }, dispatch));
 	            case 3:
-	                return React.createElement(game_1.default, __assign({turns: this.turns, users: this.players}, dispatch));
+	                return React.createElement(game_1.default, __assign({ turns: this.turns, users: this.players }, dispatch));
 	            default:
 	                return null;
 	        }
@@ -160,12 +161,12 @@
 	    return t;
 	};
 	var React = __webpack_require__(1);
-	var c = __webpack_require__(13);
-	var login_style_1 = __webpack_require__(4);
+	var c = __webpack_require__(4);
+	var login_style_1 = __webpack_require__(5);
 	var Login = (function (_super) {
 	    __extends(Login, _super);
 	    function Login(props) {
-	        _super.call(this, props);
+	        return _super.call(this, props) || this;
 	    }
 	    Login.prototype.componentDidMount = function () {
 	        this.input1.focus();
@@ -235,13 +236,12 @@
 	        var _this = this;
 	        var in1 = { onKeyUp: this.input1Handler.bind(this) };
 	        var in2 = { onKeyUp: this.input2Handler.bind(this) };
-	        return (React.createElement("div", {className: login_style_1.jss.login}, 
-	            React.createElement("h3", {className: login_style_1.jss.title}, "крестики - нолики"), 
-	            React.createElement("input", __assign({ref: function (el) { return _this.input1 = el; }, className: login_style_1.jss.input, type: "text", placeholder: "User 1"}, in1)), 
-	            React.createElement("input", __assign({ref: function (el) { return _this.input2 = el; }, className: login_style_1.jss.input, type: "text", placeholder: "User 2"}, in2)), 
-	            React.createElement("div", null, 
-	                React.createElement("button", {ref: function (el) { return _this.button = el; }, className: login_style_1.jss.button, onClick: this.loadGame.bind(this)}, "Start")
-	            ), 
+	        return (React.createElement("div", { className: login_style_1.jss.login },
+	            React.createElement("h3", { className: login_style_1.jss.title }, "\u043A\u0440\u0435\u0441\u0442\u0438\u043A\u0438 - \u043D\u043E\u043B\u0438\u043A\u0438"),
+	            React.createElement("input", __assign({ ref: function (el) { return _this.input1 = el; }, className: login_style_1.jss.input, type: "text", placeholder: "User 1" }, in1)),
+	            React.createElement("input", __assign({ ref: function (el) { return _this.input2 = el; }, className: login_style_1.jss.input, type: "text", placeholder: "User 2" }, in2)),
+	            React.createElement("div", null,
+	                React.createElement("button", { ref: function (el) { return _this.button = el; }, className: login_style_1.jss.button, onClick: this.loadGame.bind(this) }, "Start")),
 	            React.createElement("style", null, login_style_1.Style.getStyles())));
 	    };
 	    return Login;
@@ -252,10 +252,23 @@
 
 /***/ },
 /* 4 */
+/***/ function(module, exports) {
+
+	"use strict";
+	exports.GET_USERS = 'GET_USERS';
+	exports.SHOW_LEADERBAORD = 'SHOW_LEADERBAORD';
+	exports.START_GAME = 'START_GAME';
+	exports.NEW_GAME = 'NEW_GAME';
+	exports.CONGRAT_WINNER = 'CONGRAT_WINNER';
+	exports.REPLAY_GAME = 'REPLAY_GAME';
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var FreeStyle = __webpack_require__(5);
+	var FreeStyle = __webpack_require__(6);
 	exports.Style = FreeStyle.create();
 	exports.jss = {
 	    input: exports.Style.registerStyle({
@@ -263,7 +276,6 @@
 	        border: '2px solid gray',
 	        borderRadius: '6px',
 	        boxSizing: 'border-box',
-	        // float: 'none',
 	        transitionDuration: '0.5s',
 	        margin: '7px',
 	        width: '250px',
@@ -275,7 +287,7 @@
 	    }),
 	    login: exports.Style.registerStyle({
 	        margin: 'auto',
-	        marginTop: '20%',
+	        marginTop: '10%',
 	        border: '2px dashed #677380',
 	        // padding: '0px 20px 20px 20px',
 	        width: '300px'
@@ -302,7 +314,7 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {"use strict";
@@ -327,9 +339,12 @@
 	 * CSS properties that are valid unit-less numbers.
 	 */
 	var CSS_NUMBER = {
+	    'animation-iteration-count': true,
 	    'box-flex': true,
 	    'box-flex-group': true,
 	    'column-count': true,
+	    'counter-increment': true,
+	    'counter-reset': true,
 	    'flex': true,
 	    'flex-grow': true,
 	    'flex-positive': true,
@@ -397,7 +412,7 @@
 	 */
 	function styleToString(name, value) {
 	    if (typeof value === 'number' && value !== 0 && !CSS_NUMBER[name]) {
-	        value += 'px';
+	        value = value + "px";
 	    }
 	    return name + ":" + String(value).replace(/([\{\}\[\]])/g, '\\$1');
 	}
@@ -439,7 +454,7 @@
 	 */
 	function stringifyProperties(properties) {
 	    var result = [];
-	    var _loop_1 = function(name_1, value) {
+	    var _loop_1 = function (name_1, value) {
 	        if (value != null) {
 	            if (Array.isArray(value)) {
 	                result.push(value.filter(function (x) { return x != null; }).map(function (x) { return styleToString(name_1, x); }).join(';'));
@@ -660,10 +675,11 @@
 	    __extends(Style, _super);
 	    function Style(style, hash, id) {
 	        if (id === void 0) { id = "c" + hash(style); }
-	        _super.call(this, hash);
-	        this.style = style;
-	        this.hash = hash;
-	        this.id = id;
+	        var _this = _super.call(this, hash) || this;
+	        _this.style = style;
+	        _this.hash = hash;
+	        _this.id = id;
+	        return _this;
 	    }
 	    Style.prototype.getStyles = function () {
 	        return this.values().map(function (x) { return x.selector; }).join(',') + "{" + this.style + "}";
@@ -686,12 +702,13 @@
 	        if (style === void 0) { style = ''; }
 	        if (id === void 0) { id = "a" + hash(rule + "." + style); }
 	        if (pid === void 0) { pid = ''; }
-	        _super.call(this, hash);
-	        this.rule = rule;
-	        this.style = style;
-	        this.hash = hash;
-	        this.id = id;
-	        this.pid = pid;
+	        var _this = _super.call(this, hash) || this;
+	        _this.rule = rule;
+	        _this.style = style;
+	        _this.hash = hash;
+	        _this.id = id;
+	        _this.pid = pid;
+	        return _this;
 	    }
 	    Rule.prototype.getStyles = function () {
 	        return this.rule + "{" + this.style + getStyles(this) + "}";
@@ -712,10 +729,11 @@
 	    __extends(FreeStyle, _super);
 	    function FreeStyle(hash, debug, id) {
 	        if (id === void 0) { id = "f" + (++instanceId).toString(36); }
-	        _super.call(this, hash);
-	        this.hash = hash;
-	        this.debug = debug;
-	        this.id = id;
+	        var _this = _super.call(this, hash) || this;
+	        _this.hash = hash;
+	        _this.debug = debug;
+	        _this.id = id;
+	        return _this;
 	    }
 	    FreeStyle.prototype.registerStyle = function (styles, displayName) {
 	        return registerUserStyles(this, styles, this.debug ? displayName : undefined);
@@ -748,10 +766,10 @@
 	}
 	exports.create = create;
 	//# sourceMappingURL=free-style.js.map
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -937,7 +955,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -946,18 +964,35 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var __assign = (this && this.__assign) || Object.assign || function(t) {
+	    for (var s, i = 1, n = arguments.length; i < n; i++) {
+	        s = arguments[i];
+	        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+	            t[p] = s[p];
+	    }
+	    return t;
+	};
 	var React = __webpack_require__(1);
-	var c = __webpack_require__(13);
-	var game_style_1 = __webpack_require__(8);
-	var robot_1 = __webpack_require__(9);
+	var constants_1 = __webpack_require__(4);
+	var game_style_1 = __webpack_require__(9);
+	var robot_1 = __webpack_require__(10);
 	var Game = (function (_super) {
 	    __extends(Game, _super);
 	    function Game(props) {
-	        _super.call(this, props);
-	        this.cells = new Array(9);
-	        this.turns = [];
-	        this.playMode = false;
+	        var _this = _super.call(this, props) || this;
+	        _this.cells = new Array(9);
+	        _this.turns = [];
+	        _this.playMode = false;
+	        return _this;
 	    }
+	    Game.prototype.componentWillMount = function () {
+	        window.addEventListener('resize', function (event) {
+	            console.log('resize ' + window.screen.width);
+	            // this.forceUpdate()
+	        });
+	    };
+	    Game.prototype.componentWillUnmount = function () {
+	    };
 	    Game.prototype.componentDidMount = function () {
 	        this.user1.classList.add(game_style_1.jss.underline);
 	        if (this.props.turns.length > 0)
@@ -991,8 +1026,8 @@
 	        if (robot_1.win(this.turns)) {
 	            // save to log
 	            if (this.playMode)
-	                return setTimeout(this.props.onDispatch.bind(this, c.SHOW_LEADERBAORD), 1500);
-	            return setTimeout(this.props.onDispatch.bind(this, c.CONGRAT_WINNER, {
+	                return setTimeout(this.props.onDispatch.bind(this, constants_1.SHOW_LEADERBAORD), 1500);
+	            return setTimeout(this.props.onDispatch.bind(this, constants_1.CONGRAT_WINNER, {
 	                turns: this.turns,
 	                users: this.props.users,
 	                winner: (this.turns.length % 2) ? this.props.users[0] : this.props.users[1],
@@ -1000,7 +1035,7 @@
 	            }), 300);
 	        }
 	        if (robot_1.isGameEnded(this.turns))
-	            return this.props.onDispatch(c.SHOW_LEADERBAORD); // draw
+	            return this.props.onDispatch(constants_1.SHOW_LEADERBAORD); // draw
 	        this.user1.classList.toggle(game_style_1.jss.underline);
 	        this.user2.classList.toggle(game_style_1.jss.underline);
 	        if (this.nameOfCurrentUser() == 'computer') {
@@ -1016,83 +1051,84 @@
 	            return;
 	        this.makeTurn(sector);
 	    };
+	    Game.prototype.swipeHandler = function (event) {
+	        if (!event.touches || !event.touches.length)
+	            return;
+	        var dx = event.touches.item(0).pageX - this.swipeStart;
+	        if (dx >= 50) {
+	            event.target.removeEventListener('touchmove', this.swipeHandler.bind(this));
+	            this.props.onDispatch(constants_1.NEW_GAME);
+	        }
+	        if (dx <= -50) {
+	            event.target.removeEventListener('touchmove', this.swipeHandler.bind(this));
+	            this.props.onDispatch(constants_1.SHOW_LEADERBAORD);
+	        }
+	    };
+	    Game.prototype.touchHandler = function (event) {
+	        if (!event.touches || !event.touches.length)
+	            return;
+	        this.swipeStart = event.touches.item(0).pageX;
+	        console.log('start at ' + this.swipeStart);
+	        event.target.addEventListener('touchmove', this.swipeHandler.bind(this));
+	    };
 	    Game.prototype.render = function () {
-	        return (React.createElement("div", {className: game_style_1.jss.container}, 
-	            React.createElement("div", {className: game_style_1.jss.game}, 
-	                React.createElement("table", null, this.drawBoard()), 
-	                React.createElement("table", null, this.drawUsers()), 
-	                React.createElement("style", null, game_style_1.Style.getStyles()))
-	        ));
+	        var touch = {
+	            onTouchStart: this.touchHandler.bind(this)
+	        };
+	        return (React.createElement("div", __assign({ className: game_style_1.jss.container }, touch),
+	            React.createElement("div", { className: game_style_1.jss.game },
+	                React.createElement("table", null, this.drawBoard()),
+	                React.createElement("table", null, this.drawUsers()),
+	                React.createElement("style", null, game_style_1.Style.getStyles()))));
 	    };
 	    Game.prototype.drawBoard = function () {
 	        var _this = this;
-	        return (React.createElement("tbody", null, 
-	            React.createElement("tr", null, 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[0] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 0)}, 
-	                        React.createElement("i", null)
-	                    )
-	                ), 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[1] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 1)}, 
-	                        React.createElement("i", null)
-	                    )
-	                ), 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[2] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 2)}, 
-	                        React.createElement("i", null)
-	                    )
-	                )), 
-	            React.createElement("tr", null, 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[3] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 3)}, 
-	                        React.createElement("i", null)
-	                    )
-	                ), 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[4] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 4)}, 
-	                        React.createElement("i", null)
-	                    )
-	                ), 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[5] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 5)}, 
-	                        React.createElement("i", null)
-	                    )
-	                )), 
-	            React.createElement("tr", null, 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[6] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 6)}, 
-	                        React.createElement("i", null)
-	                    )
-	                ), 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[7] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 7)}, 
-	                        React.createElement("i", null)
-	                    )
-	                ), 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.cells[8] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 8)}, 
-	                        React.createElement("i", null)
-	                    )
-	                ))));
+	        return (React.createElement("tbody", null,
+	            React.createElement("tr", null,
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[0] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 0) },
+	                        React.createElement("i", null))),
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[1] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 1) },
+	                        React.createElement("i", null))),
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[2] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 2) },
+	                        React.createElement("i", null)))),
+	            React.createElement("tr", null,
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[3] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 3) },
+	                        React.createElement("i", null))),
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[4] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 4) },
+	                        React.createElement("i", null))),
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[5] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 5) },
+	                        React.createElement("i", null)))),
+	            React.createElement("tr", null,
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[6] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 6) },
+	                        React.createElement("i", null))),
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[7] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 7) },
+	                        React.createElement("i", null))),
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.cells[8] = d; }, className: game_style_1.jss.cell, onClick: this.turn.bind(this, 8) },
+	                        React.createElement("i", null))))));
 	    };
 	    Game.prototype.drawUsers = function () {
 	        var _this = this;
-	        return (React.createElement("tbody", null, 
-	            React.createElement("tr", null, 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.user1 = d; }, className: game_style_1.jss.user}, 
-	                        React.createElement("i", {className: "fa fa-times"}), 
-	                        " ", 
-	                        this.props.users[0])
-	                ), 
-	                React.createElement("td", null, 
-	                    React.createElement("div", {ref: function (d) { return _this.user2 = d; }, className: game_style_1.jss.user}, 
-	                        React.createElement("i", {className: "fa fa-circle"}), 
-	                        " ", 
-	                        this.props.users[1])
-	                ))
-	        ));
+	        return (React.createElement("tbody", null,
+	            React.createElement("tr", null,
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.user1 = d; }, className: game_style_1.jss.user },
+	                        React.createElement("i", { className: "fa fa-times" }),
+	                        "\u00A0",
+	                        this.props.users[0])),
+	                React.createElement("td", null,
+	                    React.createElement("div", { ref: function (d) { return _this.user2 = d; }, className: game_style_1.jss.user },
+	                        React.createElement("i", { className: "fa fa-circle" }),
+	                        "\u00A0",
+	                        this.props.users[1])))));
 	    };
 	    Game.prototype.nameOfCurrentUser = function () {
 	        return (this.turns.length % 2) ? this.props.users[1] : this.props.users[0];
@@ -1104,13 +1140,13 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var FreeStyle = __webpack_require__(5);
+	var FreeStyle = __webpack_require__(6);
 	exports.Style = FreeStyle.create();
-	var width = 340;
+	var width = Math.min(340, window.screen.width - 20, window.screen.height - 30);
 	exports.jss = {
 	    container: exports.Style.registerStyle({
 	        position: 'absolute',
@@ -1122,14 +1158,11 @@
 	        textAlign: 'center'
 	    }),
 	    game: exports.Style.registerStyle({
-	        position: 'relative',
+	        // position: 'relative',
 	        margin: 'auto',
 	        width: '360px',
-	        marginTop: '20%',
 	    }),
 	    cell: exports.Style.registerStyle({
-	        // width: '120px',
-	        // heisght: '120px',
 	        display: 'table-cell',
 	        width: width / 3,
 	        height: width / 3,
@@ -1142,11 +1175,10 @@
 	    user: exports.Style.registerStyle({
 	        width: width / 2,
 	        color: '#AAAAAA',
-	        padding: '15px',
+	        padding: '5px',
 	        display: 'table-cell',
 	        verticalAlign: 'middle',
 	        textAlign: 'center',
-	        fontSize: '2rem'
 	    }),
 	    underline: exports.Style.registerStyle({
 	        color: 'white',
@@ -1156,7 +1188,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1316,7 +1348,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1325,18 +1357,26 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
+	var __assign = (this && this.__assign) || Object.assign || function(t) {
+	    for (var s, i = 1, n = arguments.length; i < n; i++) {
+	        s = arguments[i];
+	        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+	            t[p] = s[p];
+	    }
+	    return t;
+	};
 	var React = __webpack_require__(1);
-	var c = __webpack_require__(13);
-	var localstore_1 = __webpack_require__(11);
-	var leaderboard_style_1 = __webpack_require__(12);
+	var constants_1 = __webpack_require__(4);
+	var localstore_1 = __webpack_require__(12);
+	var leaderboard_style_1 = __webpack_require__(13);
 	var Leaderboard = (function (_super) {
 	    __extends(Leaderboard, _super);
-	    //private name: string
 	    function Leaderboard(props) {
-	        _super.call(this, props);
-	        this.log = false;
-	        this.table = this.leaderboard();
-	        this.message = props.message;
+	        var _this = _super.call(this, props) || this;
+	        _this.log = false;
+	        _this.table = _this.leaderboard();
+	        _this.message = props.message;
+	        return _this;
 	    }
 	    Leaderboard.prototype.showLog = function (name) {
 	        this.message = name;
@@ -1344,34 +1384,56 @@
 	        this.forceUpdate();
 	    };
 	    Leaderboard.prototype.play = function (record) {
-	        this.props.onDispatch(c.REPLAY_GAME, record);
+	        this.props.onDispatch(constants_1.REPLAY_GAME, record);
+	    };
+	    Leaderboard.prototype.swipeHandler = function (event) {
+	        if (!event.touches || !event.touches.length)
+	            return;
+	        var dx = event.touches.item(0).pageX - this.swipeStart;
+	        if (dx >= 50) {
+	            event.target.removeEventListener('touchmove', this.swipeHandler.bind(this));
+	            this.props.onDispatch(constants_1.START_GAME);
+	        }
+	        if (dx <= -50) {
+	            event.target.removeEventListener('touchmove', this.swipeHandler.bind(this));
+	            this.props.onDispatch(constants_1.NEW_GAME);
+	        }
+	    };
+	    Leaderboard.prototype.touchHandler = function (event) {
+	        if (!event.touches || !event.touches.length)
+	            return;
+	        this.swipeStart = event.touches.item(0).pageX;
+	        console.log('start at ' + this.swipeStart);
+	        event.target.addEventListener('touchmove', this.swipeHandler.bind(this));
 	    };
 	    Leaderboard.prototype.render = function () {
-	        return (React.createElement("div", {className: leaderboard_style_1.jss.container}, 
-	            React.createElement("h1", null, this.message), 
-	            React.createElement("div", {className: leaderboard_style_1.jss.leaderboard}, (this.log) ? this.drawLog(this.message) : this.leaderboard()), 
-	            React.createElement("div", null, 
-	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, c.NEW_GAME)}, "New Game"), 
-	                React.createElement("button", {className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, c.START_GAME)}, "Continue")), 
+	        var touch = {
+	            onTouchStart: this.touchHandler.bind(this)
+	        };
+	        return (React.createElement("div", __assign({ className: leaderboard_style_1.jss.container }, touch),
+	            React.createElement("h1", null, this.message),
+	            React.createElement("div", { className: leaderboard_style_1.jss.leaderboard }, (this.log) ? this.drawLog(this.message) : this.leaderboard()),
+	            React.createElement("div", null,
+	                React.createElement("button", { className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, constants_1.NEW_GAME) }, "New Game"),
+	                React.createElement("button", { className: leaderboard_style_1.jss.button, onClick: this.props.onDispatch.bind(this, constants_1.START_GAME) }, "Continue")),
 	            React.createElement("style", null, leaderboard_style_1.Style.getStyles())));
 	    };
 	    Leaderboard.prototype.leaderboard = function () {
 	        var _this = this;
 	        var lb = localstore_1.getLeaderboardRecords();
 	        var records = lb.map(function (val, idx) {
-	            return (React.createElement("tr", {key: idx, onClick: function (e) { return _this.showLog(val.name); }}, 
-	                React.createElement("td", null, val.name), 
-	                React.createElement("td", null, val.w), 
+	            return (React.createElement("tr", { key: idx, onClick: function (e) { return _this.showLog(val.name); } },
+	                React.createElement("td", null, val.name),
+	                React.createElement("td", null, val.w),
 	                React.createElement("td", null, val.l)));
 	        });
-	        return (React.createElement("table", {className: leaderboard_style_1.jss.table}, 
-	            React.createElement("tbody", null, 
-	                React.createElement("tr", {className: leaderboard_style_1.jss.tableheader}, 
-	                    React.createElement("td", null, "name"), 
-	                    React.createElement("td", null, "w"), 
-	                    React.createElement("td", null, "l")), 
-	                records)
-	        ));
+	        return (React.createElement("table", { className: leaderboard_style_1.jss.table },
+	            React.createElement("tbody", null,
+	                React.createElement("tr", { className: leaderboard_style_1.jss.tableheader },
+	                    React.createElement("td", null, "name"),
+	                    React.createElement("td", null, "w"),
+	                    React.createElement("td", null, "l")),
+	                records)));
 	    };
 	    // draw users data log
 	    Leaderboard.prototype.drawLog = function (name) {
@@ -1381,17 +1443,16 @@
 	            var date = new Date(val.date);
 	            var timestr = date.toDateString().substr(4, 7) + date.toTimeString().substr(0, 8);
 	            var users = val.users.join(' - ');
-	            return (React.createElement("tr", {key: idx, onClick: function (e) { return _this.play(val); }}, 
-	                React.createElement("td", null, timestr), 
+	            return (React.createElement("tr", { key: idx, onClick: function (e) { return _this.play(val); } },
+	                React.createElement("td", null, timestr),
 	                React.createElement("td", null, users)));
 	        });
-	        return (React.createElement("table", {className: leaderboard_style_1.jss.table}, 
-	            React.createElement("tbody", null, 
-	                React.createElement("tr", {className: leaderboard_style_1.jss.tableheader}, 
-	                    React.createElement("td", null, "date"), 
-	                    React.createElement("td", null, "users")), 
-	                records)
-	        ));
+	        return (React.createElement("table", { className: leaderboard_style_1.jss.table },
+	            React.createElement("tbody", null,
+	                React.createElement("tr", { className: leaderboard_style_1.jss.tableheader },
+	                    React.createElement("td", null, "date"),
+	                    React.createElement("td", null, "users")),
+	                records)));
 	    };
 	    return Leaderboard;
 	}(React.Component));
@@ -1400,7 +1461,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1487,21 +1548,24 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var FreeStyle = __webpack_require__(5);
+	var FreeStyle = __webpack_require__(6);
+	var tabHeight = Math.min(480, window.screen.height / 2);
 	exports.Style = FreeStyle.create();
 	exports.jss = {
 	    container: exports.Style.registerStyle({
-	        color: 'silver'
+	        color: 'silver',
+	        width: '100%',
+	        height: '100%'
 	    }),
 	    leaderboard: exports.Style.registerStyle({
 	        margin: ' 30px auto',
-	        height: '400px',
+	        height: tabHeight,
 	        overflow: 'auto',
-	        width: '320px',
+	        width: '300px',
 	        background: 'rgba(100,100,100,.05)'
 	    }),
 	    table: exports.Style.registerStyle({
@@ -1520,19 +1584,6 @@
 	        textShadow: '1px 1px 2px rgba(24,56,100,.7)'
 	    })
 	};
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	"use strict";
-	exports.GET_USERS = 'GET_USERS';
-	exports.SHOW_LEADERBAORD = 'SHOW_LEADERBAORD';
-	exports.START_GAME = 'START_GAME';
-	exports.NEW_GAME = 'NEW_GAME';
-	exports.CONGRAT_WINNER = 'CONGRAT_WINNER';
-	exports.REPLAY_GAME = 'REPLAY_GAME';
 
 
 /***/ }

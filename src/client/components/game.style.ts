@@ -3,7 +3,7 @@ import * as FreeStyle from 'free-style'
 
 export const Style = FreeStyle.create()
 
-const width = 340
+const width = Math.min(340,window.screen.width-20, window.screen.height-30)
 
 export const jss = {
 
@@ -17,19 +17,17 @@ export const jss = {
         textAlign: 'center'
         // padding: '100px'
 
-
     }),
     game: Style.registerStyle({
 
-        position: 'relative',
+        // position: 'relative',
         margin: 'auto',
         width: '360px',
-        marginTop: '20%',
+        // marginTop: '10%',
         // border: '1px solid black' 
     }),
     cell: Style.registerStyle({
-        // width: '120px',
-        // heisght: '120px',
+        
         display: 'table-cell',
         width: width/3,
         height: width/3,
@@ -42,11 +40,11 @@ export const jss = {
     user: Style.registerStyle({
         width: width/2,
         color: '#AAAAAA',
-        padding: '15px',
+        padding: '5px',
         display: 'table-cell',
         verticalAlign: 'middle',
         textAlign: 'center',
-        fontSize: '2rem'
+        // fontSize: '2rem'
         // background: 'rgba(255,255,255,.5)',
     }),
     underline: Style.registerStyle({
