@@ -55,4 +55,8 @@ export const jss = {
         textDecoration: 'underline'
     }),
 
+    navy: Style.registerStyle({
+        color: '#EEEEEE'
+    })
+
 }

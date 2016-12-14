@@ -99,6 +99,24 @@ export function win(turns: number[]):boolean {
 
     return inspectAllCases(cases,createArrayOfTripples(fturns))
 }
+
+export function winningSituation(turns: number[]): number[] {
+     const cases = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ]
+    // filter last user turns
+    //the turns of the user , who made his turn last
+    const fturns = turns.filter((val, idx) => (turns.length % 2 + idx % 2 == 1)).sort()
+    const tripples = createArrayOfTripples(fturns)
+
+    for(var i = 0; i < tripples.length; i++) 
+        for(var j = 0; j < cases.length; j++){
+        if(compareArray(tripples[i], cases[j])) return cases[j]
+    }
+    return null
+}
 export function isGameEnded(turns: number[]):boolean {
     if(turns.length == 9) return true
     return false
@@ -125,10 +143,6 @@ function subtract(arr1: number[], arr2: number[]): number[] {
 
     return arr1.filter(val => arr2.indexOf(val) == -1)
 }
-
-
-
-
 
 
 //modify  array from [1,2,3,4] => [[1,2,3],[1,2,4],[1,3,4],[2,3,4]]

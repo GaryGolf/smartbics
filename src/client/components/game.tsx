@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {SHOW_LEADERBAORD, CONGRAT_WINNER,NEW_GAME} from './constants'
 import {Style, jss} from './game.style'
-import {win, isGameEnded,makeDecision} from './robot'
+import {win, isGameEnded,makeDecision, winningSituation } from './robot'
 
 interface Props {turns: number[], users: string[], onDispatch: any}
 interface State {}
@@ -24,10 +24,10 @@ export default class Game extends React.Component <Props, State>{
     }
 
     componentWillMount(){
-        window.addEventListener('resize', (event: Event) => {
-            console.log('resize '+ window.screen.width)
-            // this.forceUpdate()
-        })
+        // window.addEventListener('resize', (event: Event) => {
+        //     console.log('resize '+ window.screen.width)
+        //     // this.forceUpdate()
+        // })
     }
     componentWillUnmount() {
 
@@ -62,17 +62,23 @@ export default class Game extends React.Component <Props, State>{
         this.cells[sector].children.item(0).className = className
         // does somebody win ?
         if(win(this.turns)) {
-            // save to log
-            if(this.playMode) return setTimeout(this.props.onDispatch.bind(this, SHOW_LEADERBAORD),1500)
+            
+            // blink wwinning line
+            setTimeout(() => this.showLine(), 300 )
+            setTimeout(() => this.showLine(), 400 )
+            setTimeout(() => this.showLine(), 500 )
+            setTimeout(() => this.showLine(), 600 )
+            
+            if(this.playMode) return  setTimeout(this.props.onDispatch.bind(this, SHOW_LEADERBAORD),2000)
 
-             return setTimeout(this.props.onDispatch.bind(this, CONGRAT_WINNER,{
+            return setTimeout(this.props.onDispatch.bind(this, CONGRAT_WINNER,{
                 turns:  this.turns,
                 users:  this.props.users,
                 winner: (this.turns.length%2) ? this.props.users[0] : this.props.users[1],
                 looser: (this.turns.length%2) ? this.props.users[1] : this.props.users[0],
-            }),300)
+            }),2000)
         }
-        if(isGameEnded(this.turns)) return this.props.onDispatch(SHOW_LEADERBAORD) // draw
+        if(isGameEnded(this.turns)) return this.props.onDispatch(SHOW_LEADERBAORD) // tie
         this.user1.classList.toggle(jss.underline)
         this.user2.classList.toggle(jss.underline)
         if(this.nameOfCurrentUser() == 'computer'){
@@ -80,6 +86,15 @@ export default class Game extends React.Component <Props, State>{
             const decision = makeDecision(this.turns)
             this.makeTurn(decision)
         }
+    }
+
+    // change color at winning line
+    showLine(){
+        const situation = winningSituation(this.turns)
+        if(!situation) return
+        situation.forEach(sector => {
+            this.cells[sector].children.item(0).classList.toggle(jss.navy)    
+        })
     }
 
     // user click handler

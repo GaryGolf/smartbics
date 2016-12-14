@@ -986,10 +986,10 @@
 	        return _this;
 	    }
 	    Game.prototype.componentWillMount = function () {
-	        window.addEventListener('resize', function (event) {
-	            console.log('resize ' + window.screen.width);
-	            // this.forceUpdate()
-	        });
+	        // window.addEventListener('resize', (event: Event) => {
+	        //     console.log('resize '+ window.screen.width)
+	        //     // this.forceUpdate()
+	        // })
 	    };
 	    Game.prototype.componentWillUnmount = function () {
 	    };
@@ -1014,6 +1014,7 @@
 	        }, 1500);
 	    };
 	    Game.prototype.makeTurn = function (sector) {
+	        var _this = this;
 	        // empty sector?
 	        if (this.turns.indexOf(sector) >= 0)
 	            return;
@@ -1024,18 +1025,22 @@
 	        this.cells[sector].children.item(0).className = className;
 	        // does somebody win ?
 	        if (robot_1.win(this.turns)) {
-	            // save to log
+	            // blink wwinning line
+	            setTimeout(function () { return _this.showLine(); }, 300);
+	            setTimeout(function () { return _this.showLine(); }, 400);
+	            setTimeout(function () { return _this.showLine(); }, 500);
+	            setTimeout(function () { return _this.showLine(); }, 600);
 	            if (this.playMode)
-	                return setTimeout(this.props.onDispatch.bind(this, constants_1.SHOW_LEADERBAORD), 1500);
+	                return setTimeout(this.props.onDispatch.bind(this, constants_1.SHOW_LEADERBAORD), 2000);
 	            return setTimeout(this.props.onDispatch.bind(this, constants_1.CONGRAT_WINNER, {
 	                turns: this.turns,
 	                users: this.props.users,
 	                winner: (this.turns.length % 2) ? this.props.users[0] : this.props.users[1],
 	                looser: (this.turns.length % 2) ? this.props.users[1] : this.props.users[0],
-	            }), 300);
+	            }), 2000);
 	        }
 	        if (robot_1.isGameEnded(this.turns))
-	            return this.props.onDispatch(constants_1.SHOW_LEADERBAORD); // draw
+	            return this.props.onDispatch(constants_1.SHOW_LEADERBAORD); // tie
 	        this.user1.classList.toggle(game_style_1.jss.underline);
 	        this.user2.classList.toggle(game_style_1.jss.underline);
 	        if (this.nameOfCurrentUser() == 'computer') {
@@ -1044,6 +1049,16 @@
 	            var decision = robot_1.makeDecision(this.turns);
 	            this.makeTurn(decision);
 	        }
+	    };
+	    // change color at winning line
+	    Game.prototype.showLine = function () {
+	        var _this = this;
+	        var situation = robot_1.winningSituation(this.turns);
+	        if (!situation)
+	            return;
+	        situation.forEach(function (sector) {
+	            _this.cells[sector].children.item(0).classList.toggle(game_style_1.jss.navy);
+	        });
 	    };
 	    // user click handler
 	    Game.prototype.turn = function (sector) {
@@ -1186,6 +1201,9 @@
 	        color: 'white',
 	        textDecoration: 'underline'
 	    }),
+	    navy: exports.Style.registerStyle({
+	        color: '#EEEEEE'
+	    })
 	};
 
 
@@ -1294,6 +1312,24 @@
 	    return inspectAllCases(cases, createArrayOfTripples(fturns));
 	}
 	exports.win = win;
+	function winningSituation(turns) {
+	    var cases = [
+	        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+	        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+	        [0, 4, 8], [2, 4, 6]
+	    ];
+	    // filter last user turns
+	    //the turns of the user , who made his turn last
+	    var fturns = turns.filter(function (val, idx) { return (turns.length % 2 + idx % 2 == 1); }).sort();
+	    var tripples = createArrayOfTripples(fturns);
+	    for (var i = 0; i < tripples.length; i++)
+	        for (var j = 0; j < cases.length; j++) {
+	            if (compareArray(tripples[i], cases[j]))
+	                return cases[j];
+	        }
+	    return null;
+	}
+	exports.winningSituation = winningSituation;
 	function isGameEnded(turns) {
 	    if (turns.length == 9)
 	        return true;
