@@ -1040,7 +1040,7 @@
 	            }), 2000);
 	        }
 	        if (robot_1.isGameEnded(this.turns))
-	            return this.props.onDispatch(constants_1.SHOW_LEADERBAORD); // tie
+	            return setTimeout(this.props.onDispatch.bind(this, constants_1.SHOW_LEADERBAORD), 1000); // tie
 	        this.user1.classList.toggle(game_style_1.jss.underline);
 	        this.user2.classList.toggle(game_style_1.jss.underline);
 	        if (this.nameOfCurrentUser() == 'computer') {
@@ -1247,11 +1247,11 @@
 	// important loose prevention turn
 	function three(turns) {
 	    var cases = [
-	        [0, 8], [1, 6], [1, 3], [1, 5], [5, 7], [3, 7],
+	        [0, 8], [2, 6], [1, 6], [1, 3], [1, 5], [5, 7], [3, 7],
 	        [1, 6], [0, 5], [2, 7], [3, 8], [1, 8], [5, 6], [0, 7], [2, 3]
 	    ];
 	    var relieve = [
-	        [3, 5], [1, 7], [0, 2], [2, 8], [6, 8], [0, 6],
+	        [3, 5], [1, 7], [1, 7], [0, 2], [2, 8], [6, 8], [0, 6],
 	        [0, 3], [1, 2], [5, 8], [6, 7], [2, 5], [7, 8], [3, 6], [0, 1]
 	    ];
 	    if (turns.length < 3)
@@ -1312,6 +1312,7 @@
 	    return inspectAllCases(cases, createArrayOfTripples(fturns));
 	}
 	exports.win = win;
+	//returns tripple array (winning line)
 	function winningSituation(turns) {
 	    var cases = [
 	        [0, 1, 2], [3, 4, 5], [6, 7, 8],

@@ -34,11 +34,11 @@ function couldIwin(turns: number[]): number {
 // important loose prevention turn
 function three(turns: number[]): number {
     const cases: number[][] = [
-     [0,8],[1,6],[1,3],[1,5],[5,7],[3,7],
+     [0,8],[2,6],[1,6],[1,3],[1,5],[5,7],[3,7],
      [1,6],[0,5],[2,7],[3,8], [1,8],[5,6],[0,7],[2,3]   
     ]
     const relieve: number[][] =[
-     [3,5],[1,7],[0,2],[2,8],[6,8],[0,6],
+     [3,5],[1,7],[1,7],[0,2],[2,8],[6,8],[0,6],
      [0,3],[1,2],[5,8],[6,7], [2,5],[7,8],[3,6],[0,1]
     ]
     if(turns.length < 3) return -1
@@ -81,6 +81,7 @@ function isItDanger(turns: number[]): number{
             }
     return -1
 }
+
 function lastUserTurns(turns: number[]): number[] {
     return turns.filter((val, idx) => (turns.length % 2 + idx % 2 == 1)).sort((a,b) => a-b)
 } 
@@ -100,6 +101,7 @@ export function win(turns: number[]):boolean {
     return inspectAllCases(cases,createArrayOfTripples(fturns))
 }
 
+//returns tripple array (winning line)
 export function winningSituation(turns: number[]): number[] {
      const cases = [
         [0,1,2],[3,4,5],[6,7,8],
@@ -117,6 +119,7 @@ export function winningSituation(turns: number[]): number[] {
     }
     return null
 }
+
 export function isGameEnded(turns: number[]):boolean {
     if(turns.length == 9) return true
     return false
@@ -139,6 +142,7 @@ export function getFreeCell(turns: number[]): number {
 function random(arr: number[]): number {
     return arr[Math.floor(Math.random()*arr.length)]
 }
+
 function subtract(arr1: number[], arr2: number[]): number[] {
 
     return arr1.filter(val => arr2.indexOf(val) == -1)

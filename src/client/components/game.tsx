@@ -78,7 +78,7 @@ export default class Game extends React.Component <Props, State>{
                 looser: (this.turns.length%2) ? this.props.users[1] : this.props.users[0],
             }),2000)
         }
-        if(isGameEnded(this.turns)) return this.props.onDispatch(SHOW_LEADERBAORD) // tie
+        if(isGameEnded(this.turns)) return setTimeout(this.props.onDispatch.bind(this, SHOW_LEADERBAORD),1000) // tie
         this.user1.classList.toggle(jss.underline)
         this.user2.classList.toggle(jss.underline)
         if(this.nameOfCurrentUser() == 'computer'){
